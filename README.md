@@ -1,41 +1,41 @@
 # Browser Ask - Chrome/Chromium Extension
 
-Расширение для браузеров на базе Chromium, которое помогает ускорить работу с переводом текста, поиском на странице и объяснениями с помощью ИИ.
+A browser extension for Chromium-based browsers that helps speed up your work with text translation, on-page search, and AI-powered explanations.
 
-## Возможности
+## Features
 
-- **Поиск на странице** с поддержкой морфологии для русского языка
-- **Перевод текста** через контекстное меню
-- **Объяснения с помощью ИИ** используя DeepSeek или ChatGPT
-- **Шаблоны промптов** для быстрого взаимодействия с ИИ
-- **История чатов** с возможностью сохранения и загрузки
-- **Режим разработчика** для отслеживания использования токенов
+- **On-page search** with morphology support for Russian language
+- **Text translation** via context menu
+- **AI explanations** using DeepSeek or ChatGPT
+- **Prompt templates** for quick AI interactions
+- **Chat history** with save and load functionality
+- **Developer mode** for tracking token usage
 
-## Установка
+## Installation
 
-1. Скачайте или клонируйте репозиторий
-2. Создайте иконки расширения (16x16, 48x48, 128x128 PNG)
-3. Откройте Chrome/Chromium → `chrome://extensions/`
-4. Включите "Режим разработчика"
-5. Нажмите "Загрузить распакованное расширение" и выберите папку расширения
+1. Download or clone the repository
+2. Create extension icons (16x16, 48x48, 128x128 PNG)
+3. Open Chrome/Chromium → `chrome://extensions/`
+4. Enable "Developer mode"
+5. Click "Load unpacked extension" and select the extension folder
 
-## Быстрый старт
+## Quick Start
 
-1. Нажмите на иконку расширения для открытия попапа
-2. Используйте переключатель для включения/выключения расширения
-3. Выделите текст и правой кнопкой мыши → Расширение → Перевести или Объяснить
-4. Настройте параметры ИИ на странице настроек
+1. Click the extension icon to open the popup
+2. Use the toggle to enable/disable the extension
+3. Select text and right-click → Extension → Translate or Explain
+4. Configure AI settings on the options page
 
-## Требования
+## Requirements
 
-- Браузер на базе Chromium (Chrome, Edge, Brave, Opera и т.д.)
-- API ключ для модели ИИ (DeepSeek или OpenAI)
-- Интернет-соединение
+- Chromium-based browser (Chrome, Edge, Brave, Opera, etc.)
+- API key for AI model (DeepSeek or OpenAI)
+- Internet connection
 
-## Версия
+## Version
 
 2.3.5
 
-## Автор
+## Author
 
-Создано [The Open Tech Company](https://github.com/The-Open-Tech-Company/ask-extension-browser)
+Created by [The Open Tech Company](https://github.com/The-Open-Tech-Company/ask-extension-browser)
