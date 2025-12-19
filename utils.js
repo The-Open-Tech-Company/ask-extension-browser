@@ -26,7 +26,6 @@
     return aiSettings;
   }
 
-  // Экранирование HTML для предотвращения XSS
   function escapeHtml(text) {
     if (text == null) return '';
     const div = document.createElement("div");
@@ -42,7 +41,6 @@
     html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
     html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
     
-    // Жирный текст
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/__(.*?)__/g, '<strong>$1</strong>');
     
@@ -50,13 +48,10 @@
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     html = html.replace(/_(.*?)_/g, '<em>$1</em>');
     
-    // Код
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
     
-    // Блоки кода
     html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
     
-    // Ссылки (безопасная обработка URL)
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
       const escapedText = escapeHtml(text);
       const escapedUrl = escapeHtml(url);
@@ -67,7 +62,6 @@
       return escapedText;
     });
     
-    // Списки
     html = html.replace(/^\* (.+)$/gim, '<li>$1</li>');
     html = html.replace(/^- (.+)$/gim, '<li>$1</li>');
     html = html.replace(/^\+ (.+)$/gim, '<li>$1</li>');
@@ -78,10 +72,8 @@
       return '<ul>' + match + '</ul>';
     });
     
-    // Цитаты
     html = html.replace(/^> (.+)$/gim, '<blockquote>$1</blockquote>');
     
-    // Параграфы
     html = html.split('\n\n').map(para => {
       if (para.trim() && !para.match(/^<(h[1-6]|ul|ol|pre|blockquote)/)) {
         return '<p>' + para.trim() + '</p>';
@@ -96,7 +88,6 @@
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = { migrateAISettings, escapeHtml, markdownToHtml };
   } else if (typeof window !== 'undefined') {
-    // Создаем объект utils только если его нет
     if (!window.utils) {
       window.utils = {};
     }

@@ -84,18 +84,27 @@
 .browser-helper-copy-btn {
   flex: 1;
   padding: 6px 12px;
-  background: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   color: #333;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .browser-helper-copy-btn:hover {
-  background: #e8e8e8;
-  border-color: #bbb;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 4px 8px rgba(102, 126, 234, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 /* Стили для быстрого объяснения */
@@ -114,24 +123,36 @@
 #browser-helper-extract-facts-popup {
   position: absolute;
   z-index: 1000000;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   min-width: 300px;
   max-width: 500px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  animation: popupSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Стили для генерации вопросов */
 #browser-helper-generate-questions-popup {
   position: absolute;
   z-index: 1000000;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   min-width: 300px;
   max-width: 500px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  animation: popupSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .browser-helper-explanation-result {
@@ -153,9 +174,14 @@
   line-height: 1.6;
   margin-top: 12px;
   padding: 12px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border-left: 3px solid #1a73e8;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 10px;
+  border-left: 3px solid rgba(102, 126, 234, 0.6);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 /* Стили для форматирования markdown в объяснении */
@@ -240,6 +266,89 @@
 
 .browser-helper-explanation a:hover {
   color: #1557b0;
+}
+
+/* Адаптация под людей с эпилепсией - максимально простой интерфейс */
+.epilepsy-mode *,
+.epilepsy-mode *::before,
+.epilepsy-mode *::after {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.epilepsy-mode #browser-helper-translate-popup,
+.epilepsy-mode #browser-helper-quick-explain-popup,
+.epilepsy-mode #browser-helper-extract-facts-popup,
+.epilepsy-mode #browser-helper-generate-questions-popup {
+  background: #ffffff !important;
+  border: 2px solid #d0d0d0 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.epilepsy-mode .browser-helper-popup-content {
+  background: #ffffff !important;
+}
+
+.epilepsy-mode .browser-helper-translated {
+  color: #333333 !important;
+}
+
+.epilepsy-mode .browser-helper-explanation-title {
+  color: #333333 !important;
+  border-bottom: 2px solid #d0d0d0 !important;
+}
+
+.epilepsy-mode .browser-helper-explanation {
+  background: #f8f8f8 !important;
+  border: 2px solid #d0d0d0 !important;
+  border-left: 4px solid #666666 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode .browser-helper-explanation h1,
+.epilepsy-mode .browser-helper-explanation h2,
+.epilepsy-mode .browser-helper-explanation h3 {
+  color: #333333 !important;
+}
+
+.epilepsy-mode .browser-helper-explanation a {
+  color: #444444 !important;
+  text-decoration: underline !important;
+}
+
+.epilepsy-mode .browser-helper-explanation a:hover {
+  color: #000000 !important;
+}
+
+.epilepsy-mode .browser-helper-copy-btn {
+  background: #e8e8e8 !important;
+  border: 2px solid #cccccc !important;
+  color: #333333 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode .browser-helper-copy-btn:hover {
+  background: #d8d8d8 !important;
+  transform: none !important;
+}
+
+.epilepsy-mode .browser-helper-close {
+  color: #666666 !important;
+  border: 2px solid #cccccc !important;
+  border-radius: 4px !important;
+  background: #f0f0f0 !important;
+}
+
+.epilepsy-mode .browser-helper-close:hover {
+  background: #e0e0e0 !important;
+  color: #333333 !important;
 }
 
 

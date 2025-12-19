@@ -143,7 +143,6 @@ function searchOnPage(searchText, exactMatch, useMorphology, useRegex) {
     return { success: true, count: 0 };
   }
   
-  // Поддержка регулярных выражений
   if (useRegex) {
     try {
       const regex = new RegExp(searchText, 'g');
@@ -275,7 +274,6 @@ function searchWithRegex(regex) {
         text: text
       });
       
-      // Избегаем бесконечного цикла при пустом совпадении
       if (match[0].length === 0) {
         regex.lastIndex++;
       }
@@ -466,6 +464,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+async function applyEpilepsyModeToElement(element) {
+  const accessibilityResult = await new Promise((resolve) => {
+    chrome.storage.sync.get(['accessibilitySettings'], resolve);
+  });
+  const accessibilitySettings = accessibilityResult.accessibilitySettings || {
+    epilepsyMode: false
+  };
+  
+  if (accessibilitySettings.epilepsyMode) {
+    element.classList.add('epilepsy-mode');
+  }
+}
+
 async function showTranslatePopup(text) {
   const existingPopup = document.getElementById("browser-helper-translate-popup");
   if (existingPopup) {
@@ -491,6 +502,7 @@ async function showTranslatePopup(text) {
     </div>
   `;
 
+  await applyEpilepsyModeToElement(popup);
   document.body.appendChild(popup);
 
   positionPopup(popup, rect);
@@ -838,6 +850,7 @@ async function showQuickExplainPopup(text) {
     </div>
   `;
 
+  await applyEpilepsyModeToElement(popup);
   document.body.appendChild(popup);
   positionPopup(popup, rect);
 
@@ -1018,6 +1031,7 @@ async function showExtractFactsPopup(text) {
     </div>
   `;
 
+  await applyEpilepsyModeToElement(popup);
   document.body.appendChild(popup);
   positionPopupDown(popup, rect);
 
@@ -1059,13 +1073,10 @@ async function showExtractFactsPopup(text) {
       ? `Extract key facts from the following text. Present them as a structured list, where each fact is a separate item. Facts should be brief, accurate and informative: "${text}"`
       : `Извлеки ключевые факты из следующего текста. Представь их в виде структурированного списка, где каждый факт - это отдельный пункт. Факты должны быть краткими, точными и информативными: "${text}"`;
 
-    console.log('Отправляю запрос к ИИ, модель:', aiSettings.model, 'API ключ есть:', !!apiKey);
-
     const response = await new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        console.error('Таймаут запроса к ИИ');
         reject(new Error('Таймаут запроса к ИИ (60 секунд)'));
-      }, 60000); // 60 секунд таймаут
+      }, 60000);
 
       try {
         chrome.runtime.sendMessage({
@@ -1081,7 +1092,7 @@ async function showExtractFactsPopup(text) {
         }, (response) => {
           clearTimeout(timeout);
           if (chrome.runtime.lastError) {
-            console.error('Ошибка chrome.runtime:', chrome.runtime.lastError);
+            console.error('Ошибка chrome.runtime:', chrome.runtime.lastError.message || chrome.runtime.lastError);
             reject(new Error(chrome.runtime.lastError.message));
             return;
           }
@@ -1209,13 +1220,9 @@ async function showExtractFactsPopup(text) {
         }
       });
     }, 100);
-    
-    console.log('Popup успешно обновлен и отображается');
   } catch (error) {
-    console.error('Ошибка в showExtractFactsPopup:', error);
     const errorMessage = error.message || 'Неизвестная ошибка';
     
-    // Проверяем, что popup все еще существует
     const errorPopup = document.getElementById("browser-helper-extract-facts-popup");
     if (errorPopup) {
       const popupContent = errorPopup.querySelector(".browser-helper-popup-content");
@@ -1268,6 +1275,7 @@ async function showGenerateQuestionsPopup(text) {
     </div>
   `;
 
+  await applyEpilepsyModeToElement(popup);
   document.body.appendChild(popup);
   positionPopup(popup, rect);
 
@@ -1459,9 +1467,7 @@ function showNotesOnPage(notes) {
   });
 }
 
-// Автоматически показываем заметки при загрузке страницы
 function loadNotesForPage() {
-  // Проверяем, что chrome API доступен
   if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
     console.warn('Chrome storage API недоступен на этой странице');
     return;

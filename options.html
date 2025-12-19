@@ -31,6 +31,9 @@
           <button class="nav-item" data-tab="notes" data-i18n="settings.notes">
             Заметки
           </button>
+          <button class="nav-item" data-tab="accessibility" data-i18n="settings.accessibility">
+            Доступность
+          </button>
           <button class="nav-item" data-tab="about" data-i18n="settings.about">
             О Расширении
           </button>
@@ -163,6 +166,23 @@
             </div>
 
             <button class="save-button" id="save-ai" data-i18n="settings.save">Сохранить</button>
+          </div>
+        </div>
+
+        <!-- Вкладка настроек доступности -->
+        <div class="tab-content" id="accessibility-tab">
+          <div class="settings-section">
+            <h2 data-i18n="settings.accessibility">Доступность</h2>
+            
+            <div class="setting-item">
+              <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="epilepsy-mode" style="width: auto;">
+                <span data-i18n="settings.epilepsyMode">Адаптация под людей с эпилепсией</span>
+              </label>
+              <small class="help-text" data-i18n="settings.epilepsyModeHelp">При включении этой функции будут отключены все анимации расширения и изменены все цвета на более приглушённые</small>
+            </div>
+
+            <button class="save-button" id="save-accessibility" data-i18n="settings.save">Сохранить</button>
           </div>
         </div>
 

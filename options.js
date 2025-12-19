@@ -1,6 +1,5 @@
 let currentLanguage = 'ru';
 
-// Используем функцию из utils.js
 let migrateAISettings;
 if (typeof window !== 'undefined' && window.utils && window.utils.migrateAISettings) {
   migrateAISettings = window.utils.migrateAISettings;
@@ -31,6 +30,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadAboutInfo();
   setupEventListeners();
   initTemplates();
+  
+  // Применяем настройки доступности сразу после загрузки
+  chrome.storage.sync.get(["accessibilitySettings"], (result) => {
+    const settings = result.accessibilitySettings || {
+      epilepsyMode: false
+    };
+    applyEpilepsyMode(settings.epilepsyMode);
+  });
 });
 
 function updateLanguage() {
@@ -136,10 +143,21 @@ function loadSettings() {
       document.getElementById("chatgpt-model").value = settings.chatgptModel;
     }
   });
+
+  chrome.storage.sync.get(["accessibilitySettings"], (result) => {
+    const settings = result.accessibilitySettings || {
+      epilepsyMode: false
+    };
+    
+    const epilepsyModeCheckbox = document.getElementById("epilepsy-mode");
+    if (epilepsyModeCheckbox) {
+      epilepsyModeCheckbox.checked = settings.epilepsyMode || false;
+      applyEpilepsyMode(settings.epilepsyMode);
+    }
+  });
 }
 
 function setupEventListeners() {
-  // Обработчики для управления закладками
   const exportAllBookmarksBtn = document.getElementById('export-all-bookmarks');
   const importBookmarksBtn = document.getElementById('import-bookmarks');
   const clearAllBookmarksBtn = document.getElementById('clear-all-bookmarks');
@@ -160,7 +178,6 @@ function setupEventListeners() {
     });
   }
 
-  // Обработчики для управления заметками
   const clearAllNotesBtn = document.getElementById('clear-all-notes');
   const notesSearchInput = document.getElementById('notes-search');
   
@@ -181,6 +198,11 @@ function setupEventListeners() {
   const saveAIBtn = document.getElementById("save-ai");
   if (saveAIBtn) {
     saveAIBtn.addEventListener("click", saveAISettings);
+  }
+
+  const saveAccessibilityBtn = document.getElementById("save-accessibility");
+  if (saveAccessibilityBtn) {
+    saveAccessibilityBtn.addEventListener("click", saveAccessibilitySettings);
   }
 
   const addTemplateBtn = document.getElementById("add-template-btn");
@@ -269,6 +291,29 @@ function showStatus(message, isError) {
   setTimeout(() => {
     statusDiv.textContent = "";
   }, 3000);
+}
+
+function saveAccessibilitySettings() {
+  const epilepsyMode = document.getElementById("epilepsy-mode").checked;
+
+  const settings = {
+    epilepsyMode: epilepsyMode
+  };
+
+  chrome.storage.sync.set({ accessibilitySettings: settings }, () => {
+    applyEpilepsyMode(epilepsyMode);
+    showStatus(i18n.t('settings.saved'), false);
+  });
+}
+
+function applyEpilepsyMode(enabled) {
+  if (enabled) {
+    document.documentElement.classList.add('epilepsy-mode');
+    document.body.classList.add('epilepsy-mode');
+  } else {
+    document.documentElement.classList.remove('epilepsy-mode');
+    document.body.classList.remove('epilepsy-mode');
+  }
 }
 
 let editingTemplateId = null;
@@ -450,8 +495,6 @@ if (typeof window !== 'undefined' && window.utils && window.utils.escapeHtml) {
   };
 }
 
-// ========== УПРАВЛЕНИЕ ЗАКЛАДКАМИ ==========
-
 function normalizeUrl(url) {
   try {
     const urlObj = new URL(url);
@@ -466,7 +509,6 @@ async function loadBookmarksManagement(searchQuery = '') {
     chrome.storage.local.get(['bookmarks'], (result) => {
       let bookmarks = result.bookmarks || [];
       
-      // Фильтрация по поисковому запросу
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         bookmarks = bookmarks.filter(bookmark => {
@@ -478,7 +520,6 @@ async function loadBookmarksManagement(searchQuery = '') {
         });
       }
       
-      // Сортировка по дате создания (новые первые)
       bookmarks.sort((a, b) => b.createdAt - a.createdAt);
       
       renderBookmarksManagement(bookmarks);
@@ -660,15 +701,12 @@ async function clearAllBookmarks() {
   });
 }
 
-// ========== УПРАВЛЕНИЕ ЗАМЕТКАМИ ==========
-
 async function loadNotesManagement(searchQuery = '') {
   return new Promise((resolve) => {
     chrome.storage.local.get(['pageNotes'], (result) => {
       const allNotes = result.pageNotes || {};
       let notesList = [];
       
-      // Преобразуем объект в массив с информацией о URL
       Object.keys(allNotes).forEach(url => {
         allNotes[url].forEach(note => {
           notesList.push({
@@ -688,7 +726,6 @@ async function loadNotesManagement(searchQuery = '') {
         });
       }
       
-      // Сортировка по дате создания (новые первые)
       notesList.sort((a, b) => b.createdAt - a.createdAt);
       
       renderNotesManagement(notesList);

@@ -34,7 +34,16 @@ A browser extension for Chromium-based browsers that helps speed up your work wi
 
 ## Version
 
-2.3.5
+2.5.0
+
+## What's New in Version 2.5.0
+
+- ✨ Added regular expression search
+- ♿ Added epilepsy mode for improved accessibility
+- 💾 Improved chat history system with save and load
+- 🔍 Improved search for bookmarks and notes in settings
+- 🎨 Improved interface for managing bookmarks and notes
+- 🐛 Fixed various bugs and improved stability
 
 ## Author
 

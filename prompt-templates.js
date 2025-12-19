@@ -50,7 +50,6 @@ const PromptTemplates = {
             }
           ]);
         } else {
-          // Fallback если i18n не загружен
           const defaultTemplates = lang === 'en' ? [
             {
               id: 'explain-simple',

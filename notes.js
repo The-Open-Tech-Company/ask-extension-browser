@@ -1,4 +1,3 @@
-// Управление заметками на страницах
 const NotesManager = {
   async init() {
     try {
@@ -69,7 +68,6 @@ const NotesManager = {
   normalizeUrl(url) {
     try {
       const urlObj = new URL(url);
-      // Убираем хэш и параметры для нормализации
       return urlObj.origin + urlObj.pathname;
     } catch {
       return url;
@@ -228,5 +226,3 @@ const NotesManager = {
     }
   }
 };
-
-// Инициализация будет вызвана из popup.js после загрузки DOM

@@ -591,9 +591,6 @@ if (typeof window !== 'undefined' && window.utils && window.utils.escapeHtml) {
   };
 }
 
-// ========== ИСТОРИЯ ЧАТОВ ==========
-
-// Настройка обработчиков истории чатов
 function setupChatHistoryHandlers() {
   document.getElementById("chat-history-btn").addEventListener("click", toggleChatHistory);
   document.getElementById("close-history-btn").addEventListener("click", toggleChatHistory);
@@ -945,6 +942,25 @@ async function applyQuickPrompt(templateId) {
 
   chatInput.focus();
   chatInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function loadAccessibilitySettings() {
+  chrome.storage.sync.get(["accessibilitySettings"], (result) => {
+    const settings = result.accessibilitySettings || {
+      epilepsyMode: false
+    };
+    applyEpilepsyMode(settings.epilepsyMode);
+  });
+}
+
+function applyEpilepsyMode(enabled) {
+  if (enabled) {
+    document.documentElement.classList.add('epilepsy-mode');
+    document.body.classList.add('epilepsy-mode');
+  } else {
+    document.documentElement.classList.remove('epilepsy-mode');
+    document.body.classList.remove('epilepsy-mode');
+  }
 }
 
 window.initChat = initChat;

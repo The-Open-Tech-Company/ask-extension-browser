@@ -1,4 +1,3 @@
-// Управление закладками с тегами
 const BookmarksManager = {
   searchQuery: '',
   showAllBookmarks: false,
@@ -123,7 +122,6 @@ const BookmarksManager = {
       const bookmarks = await this.getAllBookmarks();
       let filteredBookmarks = bookmarks;
 
-      // Фильтрация по поисковому запросу
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase();
         filteredBookmarks = bookmarks.filter(bookmark => {
@@ -153,7 +151,6 @@ const BookmarksManager = {
 
     if (bookmarks.length === 0) {
       bookmarksList.innerHTML = `<div class="empty-state">${i18n.t('popup.noBookmarks')}</div>`;
-      // Удаляем кнопку "Показать всё", если она есть
       const showAllBtn = document.getElementById('showAllBookmarksBtn');
       if (showAllBtn) {
         showAllBtn.remove();
@@ -188,7 +185,6 @@ const BookmarksManager = {
       `;
     }).join('');
 
-    // Удаляем старую кнопку, если она есть
     const oldShowAllBtn = document.getElementById('showAllBookmarksBtn');
     if (oldShowAllBtn) {
       oldShowAllBtn.remove();
@@ -206,7 +202,6 @@ const BookmarksManager = {
         this.showAllBookmarks = !this.showAllBookmarks;
         this.renderBookmarks(bookmarks);
       });
-      // Добавляем кнопку после списка закладок, но внутри секции закладок
       const bookmarksSection = bookmarksList.closest('.bookmarks-section');
       if (bookmarksSection) {
         bookmarksSection.appendChild(showAllBtn);
@@ -344,10 +339,8 @@ const BookmarksManager = {
   }
 };
 
-// Инициализация будет вызвана из popup.js после загрузки DOM
-
-// Экспортируем для использования в других скриптах
 if (typeof window !== 'undefined') {
   window.BookmarksManager = BookmarksManager;
   window.NotesManager = NotesManager;
 }
+

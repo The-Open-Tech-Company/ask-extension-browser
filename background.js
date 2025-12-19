@@ -1,93 +1,109 @@
+let isCreatingMenus = false;
+let menuCreationPromise = null;
+
 async function createContextMenus() {
-  try {
-    if (!chrome.contextMenus) {
-      return;
-    }
-    
-    const result = await new Promise((resolve) => {
-      chrome.storage.sync.get(['language'], (data) => {
-        if (chrome.runtime.lastError) {
-          resolve({});
-        } else {
-          resolve(data);
-        }
-      });
-    });
-    
-    const lang = result.language || 'ru';
-    
-    await new Promise((resolve) => {
-      chrome.contextMenus.removeAll(() => {
-        resolve();
-      });
-    });
-    
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    const menuItems = [
-      {
-        id: "translate-text",
-        title: lang === 'en' ? "Translate" : "Перевести",
-        contexts: ["selection"]
-      },
-      {
-        id: "explain-text",
-        title: lang === 'en' ? "Explain" : "Объяснить",
-        contexts: ["selection"]
-      },
-      {
-        id: "quick-explain",
-        title: lang === 'en' ? "Quick Explanation" : "Быстрое объяснение",
-        contexts: ["selection"]
-      },
-      {
-        id: "extract-facts",
-        title: lang === 'en' ? "Extract Facts" : "Извлечь факты",
-        contexts: ["selection"]
-      },
-      {
-        id: "generate-questions",
-        title: lang === 'en' ? "Generate Questions" : "Создать вопросы",
-        contexts: ["selection"]
-      },
-      {
-        id: "separator-1",
-        type: "separator",
-        contexts: ["page", "selection"]
-      },
-      {
-        id: "add-bookmark",
-        title: lang === 'en' ? "Add Bookmark" : "Добавить закладку",
-        contexts: ["page"]
-      },
-      {
-        id: "add-note",
-        title: lang === 'en' ? "Add Note" : "Добавить заметку",
-        contexts: ["page"]
+  if (isCreatingMenus && menuCreationPromise) {
+    return menuCreationPromise;
+  }
+  
+  isCreatingMenus = true;
+  menuCreationPromise = (async () => {
+    try {
+      if (!chrome.contextMenus) {
+        return;
       }
-    ];
-    
-    // Создаем все пункты меню
-    let createdCount = 0;
-    for (const item of menuItems) {
-      await new Promise((resolve) => {
-        chrome.contextMenus.create(item, () => {
+      
+      const result = await new Promise((resolve) => {
+        chrome.storage.sync.get(['language'], (data) => {
           if (chrome.runtime.lastError) {
-            console.error(`Ошибка при создании меню ${item.id}:`, chrome.runtime.lastError);
+            resolve({});
           } else {
-            createdCount++;
-            console.log(`Меню создано: ${item.id} - ${item.title}`);
+            resolve(data);
           }
+        });
+      });
+      
+      const lang = result.language || 'ru';
+      
+      // Удаляем все существующие меню перед созданием новых
+      await new Promise((resolve) => {
+        chrome.contextMenus.removeAll(() => {
+          // Игнорируем ошибки при удалении (если меню не существует)
           resolve();
         });
       });
+      
+      // Даем время браузеру обработать удаление
+      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      const menuItems = [
+        {
+          id: "translate-text",
+          title: lang === 'en' ? "Translate" : "Перевести",
+          contexts: ["selection"]
+        },
+        {
+          id: "explain-text",
+          title: lang === 'en' ? "Explain" : "Объяснить",
+          contexts: ["selection"]
+        },
+        {
+          id: "quick-explain",
+          title: lang === 'en' ? "Quick Explanation" : "Быстрое объяснение",
+          contexts: ["selection"]
+        },
+        {
+          id: "extract-facts",
+          title: lang === 'en' ? "Extract Facts" : "Извлечь факты",
+          contexts: ["selection"]
+        },
+        {
+          id: "generate-questions",
+          title: lang === 'en' ? "Generate Questions" : "Создать вопросы",
+          contexts: ["selection"]
+        },
+        {
+          id: "separator-1",
+          type: "separator",
+          contexts: ["page", "selection"]
+        },
+        {
+          id: "add-bookmark",
+          title: lang === 'en' ? "Add Bookmark" : "Добавить закладку",
+          contexts: ["page"]
+        },
+        {
+          id: "add-note",
+          title: lang === 'en' ? "Add Note" : "Добавить заметку",
+          contexts: ["page"]
+        }
+      ];
+      
+      let createdCount = 0;
+      for (const item of menuItems) {
+        await new Promise((resolve) => {
+          chrome.contextMenus.create(item, () => {
+            if (chrome.runtime.lastError) {
+              console.error(`Ошибка при создании меню ${item.id}:`, chrome.runtime.lastError.message || chrome.runtime.lastError);
+            } else {
+              createdCount++;
+              console.log(`Меню создано: ${item.id} - ${item.title}`);
+            }
+            resolve();
+          });
+        });
+      }
+      
+      console.log(`Контекстное меню создано. Создано пунктов: ${createdCount}/${menuItems.length}`);
+    } catch (error) {
+      console.error('Ошибка при создании контекстного меню:', error);
+    } finally {
+      isCreatingMenus = false;
+      menuCreationPromise = null;
     }
-    
-    console.log(`=== Контекстное меню создано успешно. Создано пунктов: ${createdCount}/${menuItems.length} ===`);
-  } catch (error) {
-    console.error('Критическая ошибка при создании контекстного меню:', error);
-    console.error('Стек ошибки:', error.stack);
-  }
+  })();
+  
+  return menuCreationPromise;
 }
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
@@ -233,7 +249,6 @@ function handleSaveBookmarkFromDialog(bookmarkData, sendResponse) {
   chrome.storage.local.get(['bookmarks'], (result) => {
     const bookmarks = result.bookmarks || [];
     
-    // Проверяем, не существует ли уже такая закладка
     const normalizedUrl = normalizeUrl(bookmarkData.url);
     const exists = bookmarks.some(b => normalizeUrl(b.url) === normalizedUrl);
     

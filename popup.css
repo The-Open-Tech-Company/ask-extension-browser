@@ -7,8 +7,47 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   width: 420px;
-  background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+  background: linear-gradient(135deg, #e8f0f8 0%, #d0d9e8 50%, #e8f0f8 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 12s ease infinite;
   margin: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(200, 220, 255, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: float 15s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(20px, -20px) scale(1.05);
+    opacity: 0.8;
+  }
 }
 
 .popup-container {
@@ -17,11 +56,28 @@ body {
 }
 
 .popup-header {
-  background: linear-gradient(135deg, #6b6b6b 0%, #8a8a8a 100%);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  color: #1d1d1f;
   padding: 16px 20px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  animation: headerFadeIn 0.5s ease-out;
+}
+
+@keyframes headerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .popup-header h1 {
@@ -33,9 +89,21 @@ body {
 
 .popup-content {
   padding: 16px;
-  background: #f5f5f5;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border-radius: 0;
   margin-top: 0;
+  animation: contentFadeIn 0.6s ease-out;
+}
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Быстрые действия */
@@ -151,9 +219,26 @@ body {
 .search-section {
   margin: 0 0 16px 0;
   padding: 16px;
-  background: #e8e8e8;
-  border-radius: 6px;
-  border: 1px solid #d0d0d0;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  animation: sectionSlideUp 0.5s ease-out;
+}
+
+@keyframes sectionSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .section-title {
@@ -192,20 +277,29 @@ body {
 
 .search-btn {
   padding: 8px 18px;
-  background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
-  color: white;
-  border: none;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  color: #1d1d1f;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .search-btn:hover {
-  background: linear-gradient(135deg, #757575 0%, #616161 100%);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 4px 12px rgba(102, 126, 234, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
 .controls-grid {
@@ -263,19 +357,28 @@ body {
 
 .nav-btn {
   padding: 6px 14px;
-  background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
-  color: white;
-  border: none;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  color: #1d1d1f;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #757575 0%, #616161 100%);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 4px 8px rgba(102, 126, 234, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
 .nav-btn:disabled {
@@ -410,9 +513,15 @@ body {
 .bookmarks-section {
   margin: 16px 0;
   padding: 12px;
-  background: #e8e8e8;
-  border-radius: 6px;
-  border: 1px solid #d0d0d0;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  animation: sectionSlideUp 0.5s ease-out;
 }
 
 .bookmark-actions-compact {
@@ -444,16 +553,24 @@ body {
 .bookmark-item {
   padding: 12px;
   margin-bottom: 10px;
-  background: #f5f5f5;
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .bookmark-item:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border-color: #9e9e9e;
-  background: #ffffff;
+  box-shadow: 
+    0 4px 12px rgba(102, 126, 234, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  border-color: rgba(102, 126, 234, 0.3);
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px) scale(1.01);
 }
 
 .bookmark-header {
@@ -562,4 +679,328 @@ body {
 .show-all-bookmarks-btn:hover {
   background: linear-gradient(135deg, #757575 0%, #616161 100%);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Адаптация под людей с эпилепсией - максимально простой интерфейс */
+.epilepsy-mode *,
+.epilepsy-mode *::before,
+.epilepsy-mode *::after {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.epilepsy-mode body {
+  background: #f5f5f5 !important;
+  background-image: none !important;
+}
+
+.epilepsy-mode body::before {
+  display: none !important;
+}
+
+.epilepsy-mode .popup-container,
+body.epilepsy-mode .popup-container,
+html.epilepsy-mode .popup-container {
+  background: #ffffff !important;
+  border: 2px solid #d0d0d0 !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode .popup-header {
+  background: #e8e8e8 !important;
+  background-image: none !important;
+  border-bottom: 2px solid #d0d0d0 !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode .popup-header h1 {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #333333 !important;
+  background-clip: unset !important;
+  color: #333333 !important;
+  filter: none !important;
+}
+
+.epilepsy-mode .popup-content {
+  background: #ffffff !important;
+}
+
+.epilepsy-mode .quick-action-btn,
+.epilepsy-mode .search-btn,
+.epilepsy-mode .nav-btn,
+.epilepsy-mode .clear-btn,
+.epilepsy-mode .show-all-bookmarks-btn {
+  background: #666666 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 2px solid #555555 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+}
+
+.epilepsy-mode .quick-action-btn::before {
+  display: none !important;
+}
+
+.epilepsy-mode .quick-action-btn:hover,
+.epilepsy-mode .search-btn:hover,
+.epilepsy-mode .nav-btn:hover:not(:disabled),
+.epilepsy-mode .clear-btn:hover,
+.epilepsy-mode .show-all-bookmarks-btn:hover {
+  background: #555555 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode .quick-action-btn:active {
+  transform: none !important;
+}
+
+.epilepsy-mode .search-section,
+.epilepsy-mode .results-section,
+.epilepsy-mode .notes-section,
+.epilepsy-mode .bookmarks-section {
+  background: #ffffff !important;
+  border: 2px solid #d0d0d0 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode #searchInput {
+  background: #ffffff !important;
+  border: 2px solid #cccccc !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode #searchInput:focus {
+  border-color: #666666 !important;
+  outline: 2px solid #666666 !important;
+  outline-offset: 2px !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode .toggle-switch {
+  background: #cccccc !important;
+  border: 2px solid #999999 !important;
+  transition: none !important;
+}
+
+.epilepsy-mode .toggle-switch:checked {
+  background: #666666 !important;
+}
+
+.epilepsy-mode .toggle-switch::before {
+  background: #ffffff !important;
+  transition: none !important;
+}
+
+.epilepsy-mode .bookmark-item,
+.epilepsy-mode .note-item {
+  background: #ffffff !important;
+  border: 2px solid #d0d0d0 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode .bookmark-item:hover,
+.epilepsy-mode .note-item:hover {
+  background: #f8f8f8 !important;
+  border-color: #999999 !important;
+  transform: none !important;
+}
+
+.epilepsy-mode .bookmark-tag {
+  background: #999999 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border-radius: 2px !important;
+}
+
+.epilepsy-mode .bookmark-title {
+  color: #333333 !important;
+  text-decoration: underline !important;
+}
+
+.epilepsy-mode .bookmark-title:hover {
+  color: #000000 !important;
+}
+
+.epilepsy-mode .icon-btn-small,
+.epilepsy-mode .note-edit-btn,
+.epilepsy-mode .note-delete-btn,
+.epilepsy-mode .bookmark-edit-btn,
+.epilepsy-mode .bookmark-delete-btn {
+  background: #e8e8e8 !important;
+  border: 2px solid #cccccc !important;
+  color: #333333 !important;
+  border-radius: 4px !important;
+}
+
+.epilepsy-mode .icon-btn-small:hover,
+.epilepsy-mode .note-edit-btn:hover,
+.epilepsy-mode .note-delete-btn:hover,
+.epilepsy-mode .bookmark-edit-btn:hover,
+.epilepsy-mode .bookmark-delete-btn:hover {
+  background: #d8d8d8 !important;
+  transform: none !important;
+}
+
+.epilepsy-mode .section-title {
+  color: #333333 !important;
+  border-bottom: 2px solid #d0d0d0 !important;
+  padding-bottom: 8px !important;
+  margin-bottom: 12px !important;
+}
+
+.epilepsy-mode .controls-grid {
+  background: #f8f8f8 !important;
+  border: 2px solid #d0d0d0 !important;
+  border-radius: 4px !important;
+  padding: 8px !important;
+  margin-top: 8px !important;
+}
+
+.epilepsy-mode .switch-label {
+  background: #ffffff !important;
+  border: 1px solid #cccccc !important;
+  border-radius: 4px !important;
+  padding: 8px 10px !important;
+  margin: 4px 0 !important;
+  cursor: pointer !important;
+}
+
+.epilepsy-mode .switch-label:hover {
+  background: #f0f0f0 !important;
+  border-color: #999999 !important;
+}
+
+.epilepsy-mode .switch-label input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  margin-right: 8px !important;
+  cursor: pointer !important;
+  accent-color: #666666 !important;
+  border: 2px solid #cccccc !important;
+  border-radius: 3px !important;
+}
+
+.epilepsy-mode .switch-label input[type="checkbox"]:checked {
+  background-color: #666666 !important;
+  border-color: #555555 !important;
+}
+
+.epilepsy-mode .switch-text {
+  color: #333333 !important;
+  font-weight: 500 !important;
+  user-select: none !important;
+}
+
+.epilepsy-mode .regex-error {
+  background: #fff0f0 !important;
+  border: 2px solid #d0a0a0 !important;
+  border-radius: 4px !important;
+  color: #a03030 !important;
+  padding: 8px !important;
+  margin-top: 8px !important;
+}
+
+.epilepsy-mode .results-info {
+  color: #333333 !important;
+  font-weight: 600 !important;
+  padding: 8px !important;
+  background: #f8f8f8 !important;
+  border: 1px solid #d0d0d0 !important;
+  border-radius: 4px !important;
+  margin-bottom: 8px !important;
+}
+
+.epilepsy-mode .navigation-buttons {
+  gap: 8px !important;
+}
+
+.epilepsy-mode .bookmark-search {
+  background: #ffffff !important;
+  border: 2px solid #cccccc !important;
+  border-radius: 4px !important;
+  padding: 8px 12px !important;
+}
+
+.epilepsy-mode .bookmark-search:focus {
+  border-color: #666666 !important;
+  outline: 2px solid #666666 !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+.epilepsy-mode .bookmark-actions-compact {
+  gap: 4px !important;
+}
+
+.epilepsy-mode .bookmark-description {
+  color: #555555 !important;
+}
+
+.epilepsy-mode .bookmark-url {
+  color: #777777 !important;
+}
+
+.epilepsy-mode .note-text {
+  color: #333333 !important;
+}
+
+.epilepsy-mode .empty-state {
+  color: #666666 !important;
+  padding: 16px !important;
+  background: #f8f8f8 !important;
+  border: 1px solid #d0d0d0 !important;
+  border-radius: 4px !important;
+}
+
+.epilepsy-mode .input-group {
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+}
+
+.epilepsy-mode .quick-actions {
+  gap: 8px !important;
+  margin-bottom: 16px !important;
+}
+
+.epilepsy-mode .notes-list,
+.epilepsy-mode .bookmarks-list {
+  background: transparent !important;
+}
+
+.epilepsy-mode .note-actions {
+  gap: 8px !important;
+}
+
+.epilepsy-mode .bookmark-header {
+  margin-bottom: 8px !important;
+}
+
+.epilepsy-mode .bookmark-tags {
+  gap: 4px !important;
+  margin-bottom: 6px !important;
+}
+
+.epilepsy-mode .toggle-status {
+  color: #666666 !important;
+  font-weight: 600 !important;
+}
+
+.epilepsy-mode .toggle-status.enabled {
+  color: #333333 !important;
+}
+
+.epilepsy-mode .toggle-status.disabled {
+  color: #666666 !important;
 }

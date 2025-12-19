@@ -6,7 +6,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentLang = i18n.getCurrentLang();
     updateLanguage();
     
-    // Загружаем состояние расширения только если есть соответствующие элементы
+    loadAccessibilitySettings();
+    
     const extensionToggle = document.getElementById("extension-toggle");
     if (extensionToggle) {
       loadExtensionState();
@@ -19,7 +20,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupEventListeners();
     setupSearchListeners();
     
-    // Инициализация заметок и закладок после загрузки всех скриптов
     setTimeout(() => {
       if (typeof NotesManager !== 'undefined' && NotesManager.init) {
         NotesManager.init().catch(err => {
@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 100);
   } catch (error) {
     console.error('Ошибка инициализации popup:', error);
-    // Показываем сообщение об ошибке пользователю
     const popupContent = document.querySelector('.popup-content');
     if (popupContent && error.message && error.message.includes('chrome://')) {
       const errorMsg = document.createElement('div');
@@ -90,6 +89,59 @@ function loadExtensionState() {
     }
   });
 }
+
+function loadAccessibilitySettings() {
+  try {
+    chrome.storage.sync.get(["accessibilitySettings"], (result) => {
+      try {
+        const settings = result.accessibilitySettings || {
+          epilepsyMode: false
+        };
+        applyEpilepsyMode(settings.epilepsyMode);
+      } catch (error) {
+        console.error('Ошибка применения настроек доступности:', error);
+      }
+    });
+  } catch (error) {
+    console.error('Ошибка загрузки настроек доступности:', error);
+  }
+}
+
+function applyEpilepsyMode(enabled) {
+  try {
+    if (enabled) {
+      document.documentElement.classList.add('epilepsy-mode');
+      document.body.classList.add('epilepsy-mode');
+      const popupContainer = document.querySelector('.popup-container');
+      if (popupContainer) {
+        popupContainer.classList.add('epilepsy-mode');
+      }
+      // Применяем класс ко всем основным элементам
+      const allSections = document.querySelectorAll('.search-section, .results-section, .notes-section, .bookmarks-section');
+      allSections.forEach(section => section.classList.add('epilepsy-mode'));
+    } else {
+      document.documentElement.classList.remove('epilepsy-mode');
+      document.body.classList.remove('epilepsy-mode');
+      const popupContainer = document.querySelector('.popup-container');
+      if (popupContainer) {
+        popupContainer.classList.remove('epilepsy-mode');
+      }
+      const allSections = document.querySelectorAll('.search-section, .results-section, .notes-section, .bookmarks-section');
+      allSections.forEach(section => section.classList.remove('epilepsy-mode'));
+    }
+  } catch (error) {
+    console.error('Ошибка применения режима эпилепсии:', error);
+  }
+}
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'sync' && changes.accessibilitySettings) {
+    const newSettings = changes.accessibilitySettings.newValue || {
+      epilepsyMode: false
+    };
+    applyEpilepsyMode(newSettings.epilepsyMode);
+  }
+});
 
 function setupEventListeners() {
   const extensionToggle = document.getElementById("extension-toggle");
@@ -162,7 +214,6 @@ async function ensureContentScript(tabId) {
     await chrome.tabs.sendMessage(tabId, { action: 'ping' });
     return true;
   } catch (error) {
-    // Если страница недоступна, не пытаемся загружать скрипт
     try {
       const tab = await chrome.tabs.get(tabId);
       if (!tab || !tab.url || !isPageAccessible(tab.url)) {
@@ -222,7 +273,6 @@ function updateContextMenus(isEnabled) {
   } catch (error) {}
 }
 
-// Используем функцию из utils.js
 let migrateAISettings;
 if (typeof window !== 'undefined' && window.utils && window.utils.migrateAISettings) {
   migrateAISettings = window.utils.migrateAISettings;
