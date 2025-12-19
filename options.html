@@ -25,6 +25,12 @@
           <button class="nav-item" data-tab="templates" data-i18n="settings.templates">
             Шаблоны промптов
           </button>
+          <button class="nav-item" data-tab="bookmarks" data-i18n="settings.bookmarks">
+            Закладки
+          </button>
+          <button class="nav-item" data-tab="notes" data-i18n="settings.notes">
+            Заметки
+          </button>
           <button class="nav-item" data-tab="about" data-i18n="settings.about">
             О Расширении
           </button>
@@ -198,6 +204,44 @@
           </div>
         </div>
 
+        <!-- Вкладка управления закладками -->
+        <div class="tab-content" id="bookmarks-tab">
+          <div class="settings-section">
+            <h2 data-i18n="settings.bookmarks">Управление закладками</h2>
+            
+            <div class="management-controls">
+              <div class="search-controls">
+                <input type="text" id="bookmarks-search" class="search-input" placeholder="Поиск закладок..." autocomplete="off">
+                <button class="action-btn" id="export-all-bookmarks" data-i18n="popup.exportBookmarks">Экспорт</button>
+                <button class="action-btn" id="import-bookmarks" data-i18n="popup.importBookmarks">Импорт</button>
+                <button class="action-btn danger" id="clear-all-bookmarks">Очистить все</button>
+              </div>
+            </div>
+
+            <div class="bookmarks-management-list" id="bookmarks-management-list">
+              <!-- Закладки будут загружены динамически -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Вкладка управления заметками -->
+        <div class="tab-content" id="notes-tab">
+          <div class="settings-section">
+            <h2 data-i18n="settings.notes">Управление заметками</h2>
+            
+            <div class="management-controls">
+              <div class="search-controls">
+                <input type="text" id="notes-search" class="search-input" placeholder="Поиск заметок..." autocomplete="off">
+                <button class="action-btn danger" id="clear-all-notes">Очистить все</button>
+              </div>
+            </div>
+
+            <div class="notes-management-list" id="notes-management-list">
+              <!-- Заметки будут загружены динамически -->
+            </div>
+          </div>
+        </div>
+
         <!-- Вкладка "О Расширении" -->
         <div class="tab-content" id="about-tab">
           <div class="settings-section">
@@ -236,6 +280,7 @@
   </div>
 
   <script src="i18n.js"></script>
+  <script src="utils.js"></script>
   <script src="prompt-templates.js"></script>
   <script src="options.js"></script>
 </body>

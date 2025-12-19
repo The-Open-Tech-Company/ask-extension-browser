@@ -1,12 +1,53 @@
 let currentLang = 'ru';
 
 document.addEventListener("DOMContentLoaded", async () => {
-  await i18n.init();
-  currentLang = i18n.getCurrentLang();
-  updateLanguage();
-  loadExtensionState();
-  setupEventListeners();
-  setupSearchListeners();
+  try {
+    await i18n.init();
+    currentLang = i18n.getCurrentLang();
+    updateLanguage();
+    
+    // Загружаем состояние расширения только если есть соответствующие элементы
+    const extensionToggle = document.getElementById("extension-toggle");
+    if (extensionToggle) {
+      loadExtensionState();
+    }
+    
+    try {
+      chrome.runtime.sendMessage({ action: "recreateContextMenus" }).catch(() => {});
+    } catch (e) {}
+    
+    setupEventListeners();
+    setupSearchListeners();
+    
+    // Инициализация заметок и закладок после загрузки всех скриптов
+    setTimeout(() => {
+      if (typeof NotesManager !== 'undefined' && NotesManager.init) {
+        NotesManager.init().catch(err => {
+          console.error('Ошибка инициализации заметок:', err);
+          // Скрываем секцию заметок при ошибке на chrome:// страницах
+          const notesSection = document.getElementById('notesSection');
+          if (notesSection && err.message && err.message.includes('chrome://')) {
+            notesSection.style.display = 'none';
+          }
+        });
+      }
+      if (typeof BookmarksManager !== 'undefined' && BookmarksManager.init) {
+        BookmarksManager.init().catch(err => console.error('Ошибка инициализации закладок:', err));
+      }
+    }, 100);
+  } catch (error) {
+    console.error('Ошибка инициализации popup:', error);
+    // Показываем сообщение об ошибке пользователю
+    const popupContent = document.querySelector('.popup-content');
+    if (popupContent && error.message && error.message.includes('chrome://')) {
+      const errorMsg = document.createElement('div');
+      errorMsg.style.padding = '16px';
+      errorMsg.style.color = '#616161';
+      errorMsg.style.textAlign = 'center';
+      errorMsg.textContent = 'Некоторые функции недоступны на этой странице. Откройте обычную веб-страницу.';
+      popupContent.insertBefore(errorMsg, popupContent.firstChild);
+    }
+  }
 });
 
 function updateLanguage() {
@@ -34,39 +75,69 @@ function loadExtensionState() {
     const toggle = document.getElementById("extension-toggle");
     const status = document.getElementById("toggle-status");
     
-    toggle.checked = isEnabled;
+    if (toggle) {
+      toggle.checked = isEnabled;
+    }
     
-    if (isEnabled) {
-      status.textContent = i18n.t('popup.enabled');
-      status.className = "toggle-status enabled";
-    } else {
-      status.textContent = i18n.t('popup.disabled');
-      status.className = "toggle-status disabled";
+    if (status) {
+      if (isEnabled) {
+        status.textContent = i18n.t('popup.enabled');
+        status.className = "toggle-status enabled";
+      } else {
+        status.textContent = i18n.t('popup.disabled');
+        status.className = "toggle-status disabled";
+      }
     }
   });
 }
 
 function setupEventListeners() {
-  document.getElementById("extension-toggle").addEventListener("change", (e) => {
-    const isEnabled = e.target.checked;
-    chrome.storage.sync.set({ extensionEnabled: isEnabled }, () => {
-      loadExtensionState();
-      updateContextMenus(isEnabled);
+  const extensionToggle = document.getElementById("extension-toggle");
+  if (extensionToggle) {
+    extensionToggle.addEventListener("change", (e) => {
+      const isEnabled = e.target.checked;
+      chrome.storage.sync.set({ extensionEnabled: isEnabled }, () => {
+        const toggle = document.getElementById("extension-toggle");
+        const status = document.getElementById("toggle-status");
+        if (toggle) {
+          toggle.checked = isEnabled;
+        }
+        if (status) {
+          if (isEnabled) {
+            status.textContent = i18n.t('popup.enabled');
+            status.className = "toggle-status enabled";
+          } else {
+            status.textContent = i18n.t('popup.disabled');
+            status.className = "toggle-status disabled";
+          }
+        }
+        updateContextMenus(isEnabled);
+      });
     });
-  });
+  }
 
-  document.getElementById("open-chat").addEventListener("click", () => {
-    openAIChat();
-  });
+  const openChatBtn = document.getElementById("open-chat");
+  if (openChatBtn) {
+    openChatBtn.addEventListener("click", () => {
+      openAIChat();
+    });
+  }
 
-  document.getElementById("open-settings").addEventListener("click", () => {
-    chrome.runtime.openOptionsPage();
-  });
+  const openSettingsBtn = document.getElementById("open-settings");
+  if (openSettingsBtn) {
+    openSettingsBtn.addEventListener("click", () => {
+      chrome.runtime.openOptionsPage();
+    });
+  }
 }
 
 async function getActiveTab() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  return tab;
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    return tab;
+  } catch (error) {
+    return null;
+  }
 }
 
 function isPageAccessible(url) {
@@ -82,9 +153,25 @@ function isPageAccessible(url) {
 
 async function ensureContentScript(tabId) {
   try {
+    // Сначала проверяем, доступна ли страница для загрузки скриптов
+    const tab = await chrome.tabs.get(tabId);
+    if (!tab || !tab.url || !isPageAccessible(tab.url)) {
+      return false;
+    }
+    
     await chrome.tabs.sendMessage(tabId, { action: 'ping' });
     return true;
   } catch (error) {
+    // Если страница недоступна, не пытаемся загружать скрипт
+    try {
+      const tab = await chrome.tabs.get(tabId);
+      if (!tab || !tab.url || !isPageAccessible(tab.url)) {
+        return false;
+      }
+    } catch {
+      return false;
+    }
+    
     try {
       await chrome.scripting.insertCSS({
         target: { tabId: tabId },
@@ -114,27 +201,47 @@ async function ensureContentScript(tabId) {
 }
 
 function updateContextMenus(isEnabled) {
-  if (isEnabled) {
-    chrome.contextMenus.update("translate-text", { enabled: true });
-    chrome.contextMenus.update("explain-text", { enabled: true });
-  } else {
-    chrome.contextMenus.update("translate-text", { enabled: false });
-    chrome.contextMenus.update("explain-text", { enabled: false });
-  }
+  try {
+    if (isEnabled) {
+      chrome.contextMenus.update("translate-text", { enabled: true });
+      chrome.contextMenus.update("explain-text", { enabled: true });
+      chrome.contextMenus.update("quick-explain", { enabled: true });
+      chrome.contextMenus.update("extract-facts", { enabled: true });
+      chrome.contextMenus.update("generate-questions", { enabled: true });
+      chrome.contextMenus.update("add-bookmark", { enabled: true });
+      chrome.contextMenus.update("add-note", { enabled: true });
+    } else {
+      chrome.contextMenus.update("translate-text", { enabled: false });
+      chrome.contextMenus.update("explain-text", { enabled: false });
+      chrome.contextMenus.update("quick-explain", { enabled: false });
+      chrome.contextMenus.update("extract-facts", { enabled: false });
+      chrome.contextMenus.update("generate-questions", { enabled: false });
+      chrome.contextMenus.update("add-bookmark", { enabled: false });
+      chrome.contextMenus.update("add-note", { enabled: false });
+    }
+  } catch (error) {}
 }
 
-function migrateAISettings(aiSettings) {
-  if (aiSettings.apiKey && !aiSettings.deepseekApiKey && !aiSettings.chatgptApiKey) {
-    if (aiSettings.model === "deepseek") {
-      aiSettings.deepseekApiKey = aiSettings.apiKey;
-    } else {
-      aiSettings.chatgptApiKey = aiSettings.apiKey;
+// Используем функцию из utils.js
+let migrateAISettings;
+if (typeof window !== 'undefined' && window.utils && window.utils.migrateAISettings) {
+  migrateAISettings = window.utils.migrateAISettings;
+} else {
+  migrateAISettings = function(aiSettings) {
+    if (!aiSettings || typeof aiSettings !== 'object') return aiSettings;
+    if (aiSettings.apiKey && !aiSettings.deepseekApiKey && !aiSettings.chatgptApiKey) {
+      if (aiSettings.model === "deepseek") {
+        aiSettings.deepseekApiKey = aiSettings.apiKey;
+      } else {
+        aiSettings.chatgptApiKey = aiSettings.apiKey;
+      }
     }
-  }
-  if (aiSettings.temperature && !aiSettings.deepseekTemperature && !aiSettings.chatgptTemperature) {
-    aiSettings.deepseekTemperature = aiSettings.temperature;
-    aiSettings.chatgptTemperature = aiSettings.temperature;
-  }
+    if (aiSettings.temperature && !aiSettings.deepseekTemperature && !aiSettings.chatgptTemperature) {
+      aiSettings.deepseekTemperature = aiSettings.temperature;
+      aiSettings.chatgptTemperature = aiSettings.temperature;
+    }
+    return aiSettings;
+  };
 }
 
 function openAIChat() {
@@ -163,25 +270,64 @@ function setupSearchListeners() {
   const searchBtn = document.getElementById('searchBtn');
   const exactMatchCheckbox = document.getElementById('exactMatch');
   const morphologyCheckbox = document.getElementById('morphology');
+  const useRegexCheckbox = document.getElementById('useRegex');
+  const regexError = document.getElementById('regexError');
   const resultsSection = document.getElementById('resultsSection');
   const resultsInfo = document.getElementById('resultsInfo');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
   const clearBtn = document.getElementById('clearBtn');
 
-  async function sendMessageSafe(tabId, message) {
-    const isLoaded = await ensureContentScript(tabId);
-    if (!isLoaded) {
-      throw new Error('Не удалось загрузить скрипт на страницу. Обновите страницу и попробуйте снова.');
+  // Валидация регулярных выражений при вводе
+  searchInput.addEventListener('input', () => {
+    if (useRegexCheckbox.checked) {
+      validateRegex(searchInput.value);
+    } else {
+      regexError.style.display = 'none';
     }
+  });
+
+  useRegexCheckbox.addEventListener('change', () => {
+    if (useRegexCheckbox.checked) {
+      validateRegex(searchInput.value);
+    } else {
+      regexError.style.display = 'none';
+    }
+  });
+
+  function validateRegex(pattern) {
+    if (!pattern || !pattern.trim()) {
+      regexError.style.display = 'none';
+      return true;
+    }
+
     try {
+      new RegExp(pattern);
+      regexError.style.display = 'none';
+      return true;
+    } catch (e) {
+      regexError.textContent = i18n.t('popup.regexError') + ': ' + e.message;
+      regexError.style.display = 'block';
+      return false;
+    }
+  }
+
+  async function sendMessageSafe(tabId, message) {
+    try {
+      const isLoaded = await ensureContentScript(tabId);
+      if (!isLoaded) {
+        throw new Error(i18n.t('popup.scriptLoadError') || 'Не удалось загрузить скрипт на страницу. Обновите страницу и попробуйте снова.');
+      }
       return await chrome.tabs.sendMessage(tabId, message);
     } catch (error) {
-      if (error.message && error.message.includes('Receiving end does not exist')) {
-        console.warn('Получена ошибка связи, пытаемся перезагрузить content script...');
+      if (error.message && (error.message.includes('Receiving end does not exist') || error.message.includes('Could not establish connection'))) {
         const reloaded = await ensureContentScript(tabId);
         if (reloaded) {
-          return await chrome.tabs.sendMessage(tabId, message);
+          try {
+            return await chrome.tabs.sendMessage(tabId, message);
+          } catch (retryError) {
+            throw new Error(i18n.t('popup.scriptLoadError') || 'Не удалось загрузить скрипт на страницу. Обновите страницу и попробуйте снова.');
+          }
         }
       }
       throw error;
@@ -197,21 +343,32 @@ function setupSearchListeners() {
     }
 
     const tab = await getActiveTab();
+    if (!tab || !tab.id) {
+      alert(i18n.t('popup.searchUnavailable') || 'Поиск недоступен на этой странице. Откройте обычную веб-страницу.');
+      return;
+    }
     
     if (!isPageAccessible(tab.url)) {
-      alert(i18n.t('popup.searchUnavailable'));
+      alert(i18n.t('popup.searchUnavailable') || 'Поиск недоступен на этой странице. Откройте обычную веб-страницу.');
       return;
     }
 
     const exactMatch = exactMatchCheckbox.checked;
     const useMorphology = morphologyCheckbox.checked;
+    const useRegex = useRegexCheckbox.checked;
+
+    // Валидация регулярного выражения перед поиском
+    if (useRegex && !validateRegex(searchText)) {
+      return;
+    }
 
     try {
       const response = await sendMessageSafe(tab.id, {
         action: 'search',
         text: searchText,
         exactMatch: exactMatch,
-        useMorphology: useMorphology
+        useMorphology: useMorphology,
+        useRegex: useRegex
       });
 
       if (response && response.success) {
@@ -281,9 +438,7 @@ function setupSearchListeners() {
       totalMatches = 0;
       currentMatchIndex = -1;
       searchInput.value = '';
-    } catch (error) {
-      console.error('Ошибка при очистке:', error);
-    }
+    } catch (error) {}
   }
 
   searchBtn.addEventListener('click', performSearch);

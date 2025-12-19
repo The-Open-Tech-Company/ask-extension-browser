@@ -1,5 +1,27 @@
 let currentLanguage = 'ru';
 
+// Используем функцию из utils.js
+let migrateAISettings;
+if (typeof window !== 'undefined' && window.utils && window.utils.migrateAISettings) {
+  migrateAISettings = window.utils.migrateAISettings;
+} else {
+  migrateAISettings = function(aiSettings) {
+    if (!aiSettings || typeof aiSettings !== 'object') return aiSettings;
+    if (aiSettings.apiKey && !aiSettings.deepseekApiKey && !aiSettings.chatgptApiKey) {
+      if (aiSettings.model === "deepseek") {
+        aiSettings.deepseekApiKey = aiSettings.apiKey;
+      } else {
+        aiSettings.chatgptApiKey = aiSettings.apiKey;
+      }
+    }
+    if (aiSettings.temperature && !aiSettings.deepseekTemperature && !aiSettings.chatgptTemperature) {
+      aiSettings.deepseekTemperature = aiSettings.temperature;
+      aiSettings.chatgptTemperature = aiSettings.temperature;
+    }
+    return aiSettings;
+  };
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   await i18n.init();
   currentLanguage = i18n.getCurrentLang();
@@ -48,6 +70,10 @@ function initTabs() {
       
       if (targetTab === "templates") {
         loadTemplates();
+      } else if (targetTab === "bookmarks") {
+        loadBookmarksManagement();
+      } else if (targetTab === "notes") {
+        loadNotesManagement();
       }
     });
   });
@@ -96,17 +122,7 @@ function loadSettings() {
       developerMode: false
     };
 
-    if (settings.apiKey && !settings.deepseekApiKey && !settings.chatgptApiKey) {
-      if (settings.model === "deepseek") {
-        settings.deepseekApiKey = settings.apiKey;
-      } else {
-        settings.chatgptApiKey = settings.apiKey;
-      }
-    }
-    if (settings.temperature && !settings.deepseekTemperature && !settings.chatgptTemperature) {
-      settings.deepseekTemperature = settings.temperature;
-      settings.chatgptTemperature = settings.temperature;
-    }
+    migrateAISettings(settings);
 
     document.getElementById("ai-model").value = settings.model || "deepseek";
     document.getElementById("deepseek-api-key").value = settings.deepseekApiKey || "";
@@ -123,21 +139,77 @@ function loadSettings() {
 }
 
 function setupEventListeners() {
-  document.getElementById("save-translate").addEventListener("click", saveTranslateSettings);
-  document.getElementById("save-ai").addEventListener("click", saveAISettings);
-  document.getElementById("add-template-btn").addEventListener("click", () => {
-    showTemplateForm(null);
-  });
-  document.getElementById("save-template").addEventListener("click", saveTemplate);
-  document.getElementById("cancel-template").addEventListener("click", hideTemplateForm);
+  // Обработчики для управления закладками
+  const exportAllBookmarksBtn = document.getElementById('export-all-bookmarks');
+  const importBookmarksBtn = document.getElementById('import-bookmarks');
+  const clearAllBookmarksBtn = document.getElementById('clear-all-bookmarks');
+  const bookmarksSearchInput = document.getElementById('bookmarks-search');
   
-  document.getElementById("language-selector").addEventListener("change", (e) => {
-    const lang = e.target.value;
-    i18n.setLanguage(lang);
-    currentLanguage = lang;
-    updateLanguage();
-    loadTemplates();
-  });
+  if (exportAllBookmarksBtn) {
+    exportAllBookmarksBtn.addEventListener('click', exportAllBookmarks);
+  }
+  if (importBookmarksBtn) {
+    importBookmarksBtn.addEventListener('click', importBookmarks);
+  }
+  if (clearAllBookmarksBtn) {
+    clearAllBookmarksBtn.addEventListener('click', clearAllBookmarks);
+  }
+  if (bookmarksSearchInput) {
+    bookmarksSearchInput.addEventListener('input', () => {
+      loadBookmarksManagement(bookmarksSearchInput.value);
+    });
+  }
+
+  // Обработчики для управления заметками
+  const clearAllNotesBtn = document.getElementById('clear-all-notes');
+  const notesSearchInput = document.getElementById('notes-search');
+  
+  if (clearAllNotesBtn) {
+    clearAllNotesBtn.addEventListener('click', clearAllNotes);
+  }
+  if (notesSearchInput) {
+    notesSearchInput.addEventListener('input', () => {
+      loadNotesManagement(notesSearchInput.value);
+    });
+  }
+
+  const saveTranslateBtn = document.getElementById("save-translate");
+  if (saveTranslateBtn) {
+    saveTranslateBtn.addEventListener("click", saveTranslateSettings);
+  }
+
+  const saveAIBtn = document.getElementById("save-ai");
+  if (saveAIBtn) {
+    saveAIBtn.addEventListener("click", saveAISettings);
+  }
+
+  const addTemplateBtn = document.getElementById("add-template-btn");
+  if (addTemplateBtn) {
+    addTemplateBtn.addEventListener("click", () => {
+      showTemplateForm(null);
+    });
+  }
+
+  const saveTemplateBtn = document.getElementById("save-template");
+  if (saveTemplateBtn) {
+    saveTemplateBtn.addEventListener("click", saveTemplate);
+  }
+
+  const cancelTemplateBtn = document.getElementById("cancel-template");
+  if (cancelTemplateBtn) {
+    cancelTemplateBtn.addEventListener("click", hideTemplateForm);
+  }
+  
+  const languageSelector = document.getElementById("language-selector");
+  if (languageSelector) {
+    languageSelector.addEventListener("change", (e) => {
+      const lang = e.target.value;
+      i18n.setLanguage(lang);
+      currentLanguage = lang;
+      updateLanguage();
+      loadTemplates();
+    });
+  }
 }
 
 function saveTranslateSettings() {
@@ -365,8 +437,374 @@ async function editTemplate(templateId) {
   showTemplateForm(templateId);
 }
 
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
+// Используем функцию из utils.js
+let escapeHtml;
+if (typeof window !== 'undefined' && window.utils && window.utils.escapeHtml) {
+  escapeHtml = window.utils.escapeHtml;
+} else {
+  escapeHtml = function(text) {
+    if (text == null) return '';
+    const div = document.createElement("div");
+    div.textContent = String(text);
+    return div.innerHTML;
+  };
 }
+
+// ========== УПРАВЛЕНИЕ ЗАКЛАДКАМИ ==========
+
+function normalizeUrl(url) {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.origin + urlObj.pathname;
+  } catch {
+    return url;
+  }
+}
+
+async function loadBookmarksManagement(searchQuery = '') {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['bookmarks'], (result) => {
+      let bookmarks = result.bookmarks || [];
+      
+      // Фильтрация по поисковому запросу
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        bookmarks = bookmarks.filter(bookmark => {
+          const titleMatch = bookmark.title.toLowerCase().includes(query);
+          const descMatch = (bookmark.description || '').toLowerCase().includes(query);
+          const tagsMatch = (bookmark.tags || []).some(tag => tag.toLowerCase().includes(query));
+          const urlMatch = bookmark.url.toLowerCase().includes(query);
+          return titleMatch || descMatch || tagsMatch || urlMatch;
+        });
+      }
+      
+      // Сортировка по дате создания (новые первые)
+      bookmarks.sort((a, b) => b.createdAt - a.createdAt);
+      
+      renderBookmarksManagement(bookmarks);
+      resolve();
+    });
+  });
+}
+
+function renderBookmarksManagement(bookmarks) {
+  const list = document.getElementById('bookmarks-management-list');
+  if (!list) return;
+  
+  if (bookmarks.length === 0) {
+    list.innerHTML = `<p style="color: #666; text-align: center; padding: 20px;">${i18n.t('popup.noBookmarks')}</p>`;
+    return;
+  }
+  
+  list.innerHTML = bookmarks.map(bookmark => {
+    const tagsHtml = (bookmark.tags || []).map(tag => 
+      `<span class="bookmark-tag">${escapeHtml(tag)}</span>`
+    ).join('');
+    
+    const date = new Date(bookmark.createdAt).toLocaleString('ru-RU');
+    
+    return `
+      <div class="management-item" data-bookmark-id="${bookmark.id}">
+        <div class="management-item-header">
+          <div class="management-item-title">
+            <a href="${escapeHtml(bookmark.url)}" target="_blank" class="bookmark-link">${escapeHtml(bookmark.title)}</a>
+            <span class="management-item-date">${date}</span>
+          </div>
+          <div class="management-item-actions">
+            <button class="edit-item-btn" data-id="${bookmark.id}" title="Редактировать">✏️</button>
+            <button class="delete-item-btn" data-id="${bookmark.id}" title="Удалить">🗑️</button>
+          </div>
+        </div>
+        ${bookmark.description ? `<div class="management-item-description">${escapeHtml(bookmark.description)}</div>` : ''}
+        ${tagsHtml ? `<div class="management-item-tags">${tagsHtml}</div>` : ''}
+        <div class="management-item-url">${escapeHtml(bookmark.url)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Обработчики событий
+  list.querySelectorAll('.edit-item-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const bookmarkId = e.target.dataset.id;
+      await editBookmark(bookmarkId);
+    });
+  });
+  
+  list.querySelectorAll('.delete-item-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const bookmarkId = e.target.dataset.id;
+      if (confirm('Удалить закладку?')) {
+        await deleteBookmark(bookmarkId);
+        await loadBookmarksManagement(document.getElementById('bookmarks-search')?.value || '');
+      }
+    });
+  });
+}
+
+async function editBookmark(bookmarkId) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['bookmarks'], (result) => {
+      const bookmarks = result.bookmarks || [];
+      const bookmark = bookmarks.find(b => b.id === bookmarkId);
+      
+      if (!bookmark) {
+        alert('Закладка не найдена');
+        resolve();
+        return;
+      }
+      
+      const title = prompt('Название:', bookmark.title || '');
+      if (!title) {
+        resolve();
+        return;
+      }
+      
+      const tagsInput = prompt('Теги (через запятую):', (bookmark.tags || []).join(', '));
+      const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
+      
+      const description = prompt('Описание:', bookmark.description || '');
+      
+      bookmark.title = title.trim();
+      bookmark.tags = tags;
+      bookmark.description = description ? description.trim() : '';
+      bookmark.updatedAt = Date.now();
+      
+      chrome.storage.local.set({ bookmarks: bookmarks }, async () => {
+        await loadBookmarksManagement(document.getElementById('bookmarks-search')?.value || '');
+        showStatus('Закладка обновлена', false);
+        resolve();
+      });
+    });
+  });
+}
+
+async function deleteBookmark(bookmarkId) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['bookmarks'], (result) => {
+      const bookmarks = (result.bookmarks || []).filter(b => b.id !== bookmarkId);
+      chrome.storage.local.set({ bookmarks: bookmarks }, () => {
+        showStatus('Закладка удалена', false);
+        resolve();
+      });
+    });
+  });
+}
+
+async function exportAllBookmarks() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['bookmarks'], (result) => {
+      const bookmarks = result.bookmarks || [];
+      const dataStr = JSON.stringify(bookmarks, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `bookmarks-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showStatus('Закладки экспортированы', false);
+      resolve();
+    });
+  });
+}
+
+async function importBookmarks() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const text = await file.text();
+    try {
+      const importedBookmarks = JSON.parse(text);
+      if (!Array.isArray(importedBookmarks)) {
+        throw new Error('Invalid format');
+      }
+      
+      chrome.storage.local.get(['bookmarks'], (result) => {
+        const existingBookmarks = result.bookmarks || [];
+        const mergedBookmarks = [...existingBookmarks];
+        
+        importedBookmarks.forEach(imported => {
+          const exists = mergedBookmarks.find(b => b.id === imported.id || normalizeUrl(b.url) === normalizeUrl(imported.url));
+          if (!exists) {
+            mergedBookmarks.push({
+              ...imported,
+              id: imported.id || 'bookmark-' + Date.now() + '-' + Math.random()
+            });
+          }
+        });
+        
+        chrome.storage.local.set({ bookmarks: mergedBookmarks }, async () => {
+          await loadBookmarksManagement();
+          showStatus('Закладки импортированы', false);
+        });
+      });
+    } catch (error) {
+      showStatus('Ошибка импорта: ' + error.message, true);
+    }
+  };
+  input.click();
+}
+
+async function clearAllBookmarks() {
+  if (!confirm('Вы уверены, что хотите удалить все закладки? Это действие нельзя отменить.')) {
+    return;
+  }
+  
+  chrome.storage.local.set({ bookmarks: [] }, async () => {
+    await loadBookmarksManagement();
+    showStatus('Все закладки удалены', false);
+  });
+}
+
+// ========== УПРАВЛЕНИЕ ЗАМЕТКАМИ ==========
+
+async function loadNotesManagement(searchQuery = '') {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['pageNotes'], (result) => {
+      const allNotes = result.pageNotes || {};
+      let notesList = [];
+      
+      // Преобразуем объект в массив с информацией о URL
+      Object.keys(allNotes).forEach(url => {
+        allNotes[url].forEach(note => {
+          notesList.push({
+            ...note,
+            url: url
+          });
+        });
+      });
+      
+      // Фильтрация по поисковому запросу
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        notesList = notesList.filter(note => {
+          const textMatch = note.text.toLowerCase().includes(query);
+          const urlMatch = note.url.toLowerCase().includes(query);
+          return textMatch || urlMatch;
+        });
+      }
+      
+      // Сортировка по дате создания (новые первые)
+      notesList.sort((a, b) => b.createdAt - a.createdAt);
+      
+      renderNotesManagement(notesList);
+      resolve();
+    });
+  });
+}
+
+function renderNotesManagement(notesList) {
+  const list = document.getElementById('notes-management-list');
+  if (!list) return;
+  
+  if (notesList.length === 0) {
+    list.innerHTML = `<p style="color: #666; text-align: center; padding: 20px;">${i18n.t('popup.noNotes')}</p>`;
+    return;
+  }
+  
+  list.innerHTML = notesList.map(note => {
+    const date = new Date(note.createdAt).toLocaleString('ru-RU');
+    const urlDisplay = note.url.length > 60 ? note.url.substring(0, 60) + '...' : note.url;
+    
+    return `
+      <div class="management-item" data-note-id="${note.id}" data-note-url="${escapeHtml(note.url)}">
+        <div class="management-item-header">
+          <div class="management-item-title">
+            <span class="note-preview">${escapeHtml(note.text.length > 100 ? note.text.substring(0, 100) + '...' : note.text)}</span>
+            <span class="management-item-date">${date}</span>
+          </div>
+          <div class="management-item-actions">
+            <button class="edit-item-btn" data-id="${note.id}" data-url="${escapeHtml(note.url)}" title="Редактировать">✏️</button>
+            <button class="delete-item-btn" data-id="${note.id}" data-url="${escapeHtml(note.url)}" title="Удалить">🗑️</button>
+          </div>
+        </div>
+        <div class="management-item-url">${escapeHtml(urlDisplay)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Обработчики событий
+  list.querySelectorAll('.edit-item-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const noteId = e.target.dataset.id;
+      const url = e.target.dataset.url;
+      await editNote(noteId, url);
+    });
+  });
+  
+  list.querySelectorAll('.delete-item-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const noteId = e.target.dataset.id;
+      const url = e.target.dataset.url;
+      if (confirm('Удалить заметку?')) {
+        await deleteNote(noteId, url);
+        await loadNotesManagement(document.getElementById('notes-search')?.value || '');
+      }
+    });
+  });
+}
+
+async function editNote(noteId, url) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['pageNotes'], (result) => {
+      const allNotes = result.pageNotes || {};
+      const notes = allNotes[url] || [];
+      const note = notes.find(n => n.id === noteId);
+      
+      if (!note) {
+        alert('Заметка не найдена');
+        resolve();
+        return;
+      }
+      
+      const text = prompt('Текст заметки:', note.text || '');
+      if (!text || text.trim() === note.text) {
+        resolve();
+        return;
+      }
+      
+      note.text = text.trim();
+      note.updatedAt = Date.now();
+      
+      chrome.storage.local.set({ pageNotes: allNotes }, async () => {
+        await loadNotesManagement(document.getElementById('notes-search')?.value || '');
+        showStatus('Заметка обновлена', false);
+        resolve();
+      });
+    });
+  });
+}
+
+async function deleteNote(noteId, url) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['pageNotes'], (result) => {
+      const allNotes = result.pageNotes || {};
+      if (allNotes[url]) {
+        allNotes[url] = allNotes[url].filter(n => n.id !== noteId);
+        if (allNotes[url].length === 0) {
+          delete allNotes[url];
+        }
+      }
+      chrome.storage.local.set({ pageNotes: allNotes }, () => {
+        showStatus('Заметка удалена', false);
+        resolve();
+      });
+    });
+  });
+}
+
+async function clearAllNotes() {
+  if (!confirm('Вы уверены, что хотите удалить все заметки? Это действие нельзя отменить.')) {
+    return;
+  }
+  
+  chrome.storage.local.set({ pageNotes: {} }, async () => {
+    await loadNotesManagement();
+    showStatus('Все заметки удалены', false);
+  });
+}
+

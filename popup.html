@@ -13,16 +13,21 @@
     </div>
 
     <div class="popup-content">
-      <div class="toggle-section">
-        <label class="toggle-label">
-          <span data-i18n="popup.extension">Расширение</span>
-          <input type="checkbox" id="extension-toggle" class="toggle-switch">
-        </label>
-        <div class="toggle-status" id="toggle-status" data-i18n="popup.enabled">Включено</div>
+      <!-- Быстрые действия -->
+      <div class="quick-actions">
+        <button class="quick-action-btn" id="open-chat">
+          <span class="quick-action-text" data-i18n="popup.aiChat">Чат с ИИ</span>
+        </button>
+        <button class="quick-action-btn" id="open-settings">
+          <span class="quick-action-text" data-i18n="popup.settings">Настройки</span>
+        </button>
       </div>
 
       <!-- Поиск на странице -->
       <div class="search-section">
+        <div class="section-title">
+          <span>Поиск на странице</span>
+        </div>
         <div class="input-group">
           <input 
             type="text" 
@@ -34,7 +39,7 @@
           <button id="searchBtn" class="search-btn" data-i18n="popup.searchBtn">Поиск</button>
         </div>
         
-        <div class="controls">
+        <div class="controls-grid">
           <label class="switch-label">
             <input type="checkbox" id="exactMatch">
             <span class="switch-text" data-i18n="popup.exactMatch">Точное совпадение</span>
@@ -42,36 +47,55 @@
           
           <label class="switch-label">
             <input type="checkbox" id="morphology">
-            <span class="switch-text" data-i18n="popup.morphology">Учитывать морфологию</span>
+            <span class="switch-text" data-i18n="popup.morphology">Морфология</span>
+          </label>
+          
+          <label class="switch-label">
+            <input type="checkbox" id="useRegex">
+            <span class="switch-text" data-i18n="popup.useRegex">Regex</span>
           </label>
         </div>
+        <div id="regexError" class="regex-error" style="display: none;"></div>
       </div>
 
       <div class="results-section" id="resultsSection" style="display: none;">
         <div class="results-info" id="resultsInfo"></div>
         <div class="navigation-buttons">
-          <button id="prevBtn" class="nav-btn" disabled data-i18n="popup.prev">← Назад</button>
-          <button id="nextBtn" class="nav-btn" disabled data-i18n="popup.next">Вперед →</button>
+          <button id="prevBtn" class="nav-btn" disabled data-i18n="popup.prev">Назад</button>
+          <button id="nextBtn" class="nav-btn" disabled data-i18n="popup.next">Вперед</button>
         </div>
       </div>
 
       <button id="clearBtn" class="clear-btn" style="display: none;" data-i18n="popup.clear">Очистить выделения</button>
 
-      <div class="buttons-section">
-        <button class="action-button-small" id="open-chat">
-          <span class="button-icon-small">💬</span>
-          <span data-i18n="popup.aiChat">Чат с ИИ</span>
-        </button>
+      <!-- Заметки на странице -->
+      <div class="notes-section" id="notesSection" style="display: block;">
+        <div class="section-title">
+          <span data-i18n="popup.notes">Заметки</span>
+          <button id="addNoteBtn" class="icon-btn-small" title="Добавить заметку">+</button>
+        </div>
+        <div id="notesList" class="notes-list"></div>
+      </div>
 
-        <button class="action-button-small" id="open-settings">
-          <span class="button-icon-small">⚙️</span>
-          <span data-i18n="popup.settings">Настройки</span>
-        </button>
+      <!-- Закладки -->
+      <div class="bookmarks-section" id="bookmarksSection" style="display: block;">
+        <div class="section-title">
+          <span data-i18n="popup.bookmarks">Закладки</span>
+          <div class="bookmark-actions-compact">
+            <button id="addBookmarkBtn" class="icon-btn-small" title="Добавить закладку">+</button>
+            <button id="bookmarkSearchBtn" class="icon-btn-small" title="Поиск закладок">Поиск</button>
+          </div>
+        </div>
+        <input type="text" id="bookmarkSearchInput" class="bookmark-search" placeholder="Поиск закладок..." style="display: none;">
+        <div id="bookmarksList" class="bookmarks-list"></div>
       </div>
     </div>
   </div>
 
   <script src="i18n.js"></script>
+  <script src="utils.js"></script>
+  <script src="notes.js"></script>
+  <script src="bookmarks.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

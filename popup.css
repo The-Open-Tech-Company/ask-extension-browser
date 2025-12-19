@@ -7,7 +7,8 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   width: 420px;
-  background: #fafafa;
+  background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+  margin: 0;
 }
 
 .popup-container {
@@ -16,21 +17,61 @@ body {
 }
 
 .popup-header {
-  background: #2d3748;
-  color: #f7fafc;
-  padding: 18px 24px;
+  background: linear-gradient(135deg, #6b6b6b 0%, #8a8a8a 100%);
+  color: #ffffff;
+  padding: 16px 20px;
   text-align: center;
-  border-bottom: 1px solid #4a5568;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .popup-header h1 {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
 }
 
 .popup-content {
-  padding: 24px;
-  background: #ffffff;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 0;
+  margin-top: 0;
+}
+
+/* Быстрые действия */
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.quick-action-btn:hover {
+  background: linear-gradient(135deg, #757575 0%, #616161 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quick-action-btn:active {
+  transform: translateY(1px);
+}
+
+.quick-action-text {
+  font-size: 13px;
 }
 
 .toggle-section {
@@ -97,52 +138,34 @@ body {
   color: #d32f2f;
 }
 
-.buttons-section {
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
-}
-
-.action-button-small {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  flex: 1;
-  padding: 6px 10px;
-  background: #f5f5f5;
-  color: #666;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 400;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.action-button-small:hover {
+/* Улучшенные результаты поиска */
+.results-section {
+  margin: 12px 0;
+  padding: 12px;
   background: #e8e8e8;
-  border-color: #ccc;
-  color: #333;
-}
-
-.action-button-small:active {
-  background: #ddd;
-}
-
-.button-icon-small {
-  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #d0d0d0;
 }
 
 /* Стили для поиска */
 .search-section {
-  margin: 0;
-  padding: 16px 0;
-  border-top: none;
-  border-bottom: 1px solid #e0e0e0;
+  margin: 0 0 16px 0;
+  padding: 16px;
+  background: #e8e8e8;
+  border-radius: 6px;
+  border: 1px solid #d0d0d0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a4a4a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .input-group {
@@ -154,20 +177,22 @@ body {
 #searchInput {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #bdbdbd;
   border-radius: 4px;
   font-size: 14px;
   outline: none;
+  background: #ffffff;
+  color: #333;
 }
 
 #searchInput:focus {
-  border-color: #718096;
-  box-shadow: 0 0 0 2px rgba(113, 128, 150, 0.1);
+  border-color: #9e9e9e;
+  box-shadow: 0 0 0 2px rgba(158, 158, 158, 0.2);
 }
 
 .search-btn {
   padding: 8px 18px;
-  background: #4a5568;
+  background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
   color: white;
   border: none;
   border-radius: 4px;
@@ -175,24 +200,34 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .search-btn:hover {
-  background: #2d3748;
+  background: linear-gradient(135deg, #757575 0%, #616161 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.controls {
-  display: flex;
-  flex-direction: column;
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+  margin-top: 8px;
 }
 
 .switch-label {
   display: flex;
   align-items: center;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.switch-label:hover {
+  background: rgba(158, 158, 158, 0.15);
 }
 
 .switch-label input[type="checkbox"] {
@@ -207,15 +242,17 @@ body {
 .results-section {
   margin: 12px 0;
   padding: 12px;
-  background: #f5f5f5;
-  border-radius: 4px;
+  background: #e8e8e8;
+  border-radius: 6px;
+  border: 1px solid #d0d0d0;
 }
 
 .results-info {
   font-size: 13px;
-  color: #333;
+  color: #616161;
   margin-bottom: 8px;
   text-align: center;
+  font-weight: 500;
 }
 
 .navigation-buttons {
@@ -226,7 +263,7 @@ body {
 
 .nav-btn {
   padding: 6px 14px;
-  background: #4a5568;
+  background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
   color: white;
   border: none;
   border-radius: 4px;
@@ -237,27 +274,292 @@ body {
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: #2d3748;
+  background: linear-gradient(135deg, #757575 0%, #616161 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .nav-btn:disabled {
-  background: #ccc;
+  background: #bdbdbd;
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .clear-btn {
   width: 100%;
-  padding: 8px;
-  background: #f44336;
+  padding: 10px;
+  background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   margin-top: 8px;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .clear-btn:hover {
-  background: #d32f2f;
+  background: linear-gradient(135deg, #757575 0%, #616161 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Стили для регулярных выражений */
+.regex-error {
+  margin-top: 8px;
+  padding: 8px;
+  background: #e0e0e0;
+  color: #616161;
+  border: 1px solid #9e9e9e;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* Стили для заметок */
+.notes-section {
+  margin: 16px 0;
+  padding: 12px;
+  background: #e8e8e8;
+  border-radius: 6px;
+  border: 1px solid #d0d0d0;
+}
+
+.icon-btn-small {
+  background: #bdbdbd;
+  border: 1px solid #9e9e9e;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  margin-left: auto;
+  color: #333;
+  font-weight: 500;
+}
+
+.icon-btn-small:hover {
+  background: #9e9e9e;
+  color: white;
+  border-color: #757575;
+}
+
+.notes-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.note-item {
+  padding: 10px;
+  margin-bottom: 8px;
+  background: #f5f5f5;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.note-item:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-color: #9e9e9e;
+  background: #ffffff;
+}
+
+.note-text {
+  font-size: 13px;
+  color: #424242;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.note-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.note-edit-btn,
+.note-delete-btn {
+  background: #bdbdbd;
+  border: 1px solid #9e9e9e;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  color: #333;
+  font-weight: 500;
+}
+
+.note-edit-btn:hover,
+.note-delete-btn:hover {
+  background: #9e9e9e;
+  color: white;
+  border-color: #757575;
+}
+
+.empty-state {
+  text-align: center;
+  color: #9e9e9e;
+  font-size: 13px;
+  padding: 20px;
+  font-style: italic;
+}
+
+/* Стили для закладок */
+.bookmarks-section {
+  margin: 16px 0;
+  padding: 12px;
+  background: #e8e8e8;
+  border-radius: 6px;
+  border: 1px solid #d0d0d0;
+}
+
+.bookmark-actions-compact {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.bookmark-search {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+}
+
+.bookmark-search:focus {
+  border-color: #718096;
+  box-shadow: 0 0 0 2px rgba(113, 128, 150, 0.1);
+}
+
+.bookmarks-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.bookmark-item {
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #f5f5f5;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.bookmark-item:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-color: #9e9e9e;
+  background: #ffffff;
+}
+
+.bookmark-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.bookmark-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1976d2;
+  text-decoration: none;
+  flex: 1;
+  margin-right: 8px;
+  word-break: break-word;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.bookmark-title:hover {
+  color: #1565c0;
+  text-decoration: underline;
+}
+
+.bookmark-title:visited {
+  color: #7b1fa2;
+}
+
+.bookmark-title:active {
+  color: #0d47a1;
+}
+
+.bookmark-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.bookmark-edit-btn,
+.bookmark-delete-btn {
+  background: #bdbdbd;
+  border: 1px solid #9e9e9e;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  color: #333;
+  font-weight: 500;
+}
+
+.bookmark-edit-btn:hover,
+.bookmark-delete-btn:hover {
+  background: #9e9e9e;
+  color: white;
+  border-color: #757575;
+}
+
+.bookmark-description {
+  font-size: 12px;
+  color: #616161;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.bookmark-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.bookmark-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.bookmark-url {
+  font-size: 11px;
+  color: #999;
+  word-break: break-all;
+  margin-top: 6px;
+}
+
+.show-all-bookmarks-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.show-all-bookmarks-btn:hover {
+  background: linear-gradient(135deg, #757575 0%, #616161 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }

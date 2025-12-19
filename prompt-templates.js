@@ -33,6 +33,20 @@ const PromptTemplates = {
               shortName: i18n.t('prompt.summarizeShort'),
               prompt: i18n.t('prompt.summarizeText'),
               description: i18n.t('prompt.summarizeDesc')
+            },
+            {
+              id: 'extract-facts',
+              name: i18n.t('prompt.extractFacts'),
+              shortName: i18n.t('prompt.extractFactsShort'),
+              prompt: i18n.t('prompt.extractFactsText'),
+              description: i18n.t('prompt.extractFactsDesc')
+            },
+            {
+              id: 'generate-questions',
+              name: i18n.t('prompt.generateQuestions'),
+              shortName: i18n.t('prompt.generateQuestionsShort'),
+              prompt: i18n.t('prompt.generateQuestionsText'),
+              description: i18n.t('prompt.generateQuestionsDesc')
             }
           ]);
         } else {
@@ -65,6 +79,20 @@ const PromptTemplates = {
               shortName: 'summarize',
               prompt: 'Make a brief summary of this text, highlighting the main ideas:',
               description: 'Creating a brief summary of text'
+            },
+            {
+              id: 'extract-facts',
+              name: 'Extract Facts',
+              shortName: 'facts',
+              prompt: 'Extract key facts from the following text. Present them as a structured list, where each fact is a separate item. Facts should be brief, accurate and informative:',
+              description: 'Automatic extraction of key facts from text'
+            },
+            {
+              id: 'generate-questions',
+              name: 'Generate Questions',
+              shortName: 'questions',
+              prompt: 'Create a list of questions based on the following text for better memorization and understanding of the material. Questions should be of different difficulty levels and cover the main ideas of the text:',
+              description: 'Generating questions from text for better memorization'
             }
           ] : [
             {
@@ -94,6 +122,20 @@ const PromptTemplates = {
               shortName: 'сократи',
               prompt: 'Сделай краткое резюме этого текста, выделив основные идеи:',
               description: 'Создание краткого содержания текста'
+            },
+            {
+              id: 'extract-facts',
+              name: 'Извлечь факты',
+              shortName: 'факты',
+              prompt: 'Извлеки ключевые факты из следующего текста. Представь их в виде структурированного списка, где каждый факт - это отдельный пункт. Факты должны быть краткими, точными и информативными:',
+              description: 'Автоматическое выделение ключевых фактов из текста'
+            },
+            {
+              id: 'generate-questions',
+              name: 'Создать вопросы',
+              shortName: 'вопросы',
+              prompt: 'Создай список вопросов по следующему тексту для лучшего запоминания и понимания материала. Вопросы должны быть разного уровня сложности и охватывать основные идеи текста:',
+              description: 'Генерация вопросов по тексту для лучшего запоминания'
             }
           ];
           resolve(defaultTemplates);
@@ -130,6 +172,20 @@ const PromptTemplates = {
       shortName: 'сократи',
       prompt: 'Сделай краткое резюме этого текста, выделив основные идеи:',
       description: 'Создание краткого содержания текста'
+    },
+    {
+      id: 'extract-facts',
+      name: 'Извлечь факты',
+      shortName: 'факты',
+      prompt: 'Извлеки ключевые факты из следующего текста. Представь их в виде структурированного списка, где каждый факт - это отдельный пункт. Факты должны быть краткими, точными и информативными:',
+      description: 'Автоматическое выделение ключевых фактов из текста'
+    },
+    {
+      id: 'generate-questions',
+      name: 'Создать вопросы',
+      shortName: 'вопросы',
+      prompt: 'Создай список вопросов по следующему тексту для лучшего запоминания и понимания материала. Вопросы должны быть разного уровня сложности и охватывать основные идеи текста:',
+      description: 'Генерация вопросов по тексту для лучшего запоминания'
     }
   ],
 
