@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Объяснение текста</title>
+  <link rel="stylesheet" href="ai-chat.css">
+</head>
+<body>
+  <div class="ai-chat-container">
+    <div class="ai-chat-header">
+      <h2 data-i18n="chat.title">Чат с ИИ</h2>
+      <div class="chat-header-actions">
+        <button id="chat-history-btn" class="header-btn" data-i18n-title="chat.history" title="История чатов">📚</button>
+        <button id="save-chat-btn" class="header-btn" data-i18n-title="chat.save" title="Сохранить чат">💾</button>
+        <button id="clear-chat-btn" class="header-btn" data-i18n-title="chat.clear" title="Очистить чат">🗑️</button>
+      </div>
+    </div>
+    <div id="chat-history-panel" class="chat-history-panel" style="display: none;">
+      <div class="chat-history-header">
+        <h3 data-i18n="chat.history">История чатов</h3>
+        <button id="close-history-btn" class="close-btn">×</button>
+      </div>
+      <div id="chat-history-list" class="chat-history-list">
+        <!-- История будет загружена динамически -->
+      </div>
+    </div>
+    <div class="ai-chat-messages" id="chat-messages"></div>
+    <div class="ai-chat-input-area">
+      <div class="ai-chat-options" id="chat-options"></div>
+      <div class="input-wrapper">
+        <button id="prompt-menu-btn" class="prompt-menu-btn" data-i18n-title="chat.quickPrompts" title="Быстрые промпты">+</button>
+        <div id="prompt-menu" class="prompt-menu" style="display: none;">
+          <div class="prompt-menu-header" data-i18n="chat.quickPrompts">Быстрые промпты</div>
+          <div id="prompt-menu-items" class="prompt-menu-items">
+            <!-- Промпты будут загружены динамически -->
+          </div>
+        </div>
+        <textarea id="chat-input" data-i18n-placeholder="chat.placeholder" placeholder="Задайте вопрос..."></textarea>
+        <button id="send-message" class="send-btn-round" title="Отправить">➤</button>
+      </div>
+    </div>
+  </div>
+  <script src="i18n.js"></script>
+  <script src="prompt-templates.js"></script>
+  <script src="ai-chat.js"></script>
+  <script src="ai-chat-init.js"></script>
+</body>
+</html>
+

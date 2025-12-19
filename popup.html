@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Браузерный помощник</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <h1 data-i18n="popup.title">Браузерный помощник</h1>
+    </div>
+
+    <div class="popup-content">
+      <div class="toggle-section">
+        <label class="toggle-label">
+          <span data-i18n="popup.extension">Расширение</span>
+          <input type="checkbox" id="extension-toggle" class="toggle-switch">
+        </label>
+        <div class="toggle-status" id="toggle-status" data-i18n="popup.enabled">Включено</div>
+      </div>
+
+      <!-- Поиск на странице -->
+      <div class="search-section">
+        <div class="input-group">
+          <input 
+            type="text" 
+            id="searchInput" 
+            data-i18n-placeholder="popup.search"
+            placeholder="Поиск на странице..."
+            autocomplete="off"
+          />
+          <button id="searchBtn" class="search-btn" data-i18n="popup.searchBtn">Поиск</button>
+        </div>
+        
+        <div class="controls">
+          <label class="switch-label">
+            <input type="checkbox" id="exactMatch">
+            <span class="switch-text" data-i18n="popup.exactMatch">Точное совпадение</span>
+          </label>
+          
+          <label class="switch-label">
+            <input type="checkbox" id="morphology">
+            <span class="switch-text" data-i18n="popup.morphology">Учитывать морфологию</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="results-section" id="resultsSection" style="display: none;">
+        <div class="results-info" id="resultsInfo"></div>
+        <div class="navigation-buttons">
+          <button id="prevBtn" class="nav-btn" disabled data-i18n="popup.prev">← Назад</button>
+          <button id="nextBtn" class="nav-btn" disabled data-i18n="popup.next">Вперед →</button>
+        </div>
+      </div>
+
+      <button id="clearBtn" class="clear-btn" style="display: none;" data-i18n="popup.clear">Очистить выделения</button>
+
+      <div class="buttons-section">
+        <button class="action-button-small" id="open-chat">
+          <span class="button-icon-small">💬</span>
+          <span data-i18n="popup.aiChat">Чат с ИИ</span>
+        </button>
+
+        <button class="action-button-small" id="open-settings">
+          <span class="button-icon-small">⚙️</span>
+          <span data-i18n="popup.settings">Настройки</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

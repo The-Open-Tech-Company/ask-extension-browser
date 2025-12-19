@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Настройки расширения</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="options-container">
+    <div class="options-header">
+      <h1 data-i18n="settings.title">Настройки расширения</h1>
+    </div>
+
+    <div class="options-layout">
+      <!-- Левая колонка - меню разделов -->
+      <div class="sidebar">
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-tab="translate" data-i18n="settings.translate">
+            Настройки перевода
+          </button>
+          <button class="nav-item" data-tab="ai" data-i18n="settings.ai">
+            Настройки AI
+          </button>
+          <button class="nav-item" data-tab="templates" data-i18n="settings.templates">
+            Шаблоны промптов
+          </button>
+          <button class="nav-item" data-tab="about" data-i18n="settings.about">
+            О Расширении
+          </button>
+        </nav>
+      </div>
+
+      <!-- Правая колонка - контент -->
+      <div class="content-area">
+        <!-- Вкладка настроек перевода -->
+        <div class="tab-content active" id="translate-tab">
+          <div class="settings-section">
+            <h2 data-i18n="settings.translate">Настройки перевода</h2>
+            
+            <div class="language-switcher">
+              <label data-i18n="settings.language">Язык интерфейса</label>
+              <select id="language-selector">
+                <option value="ru" data-i18n="settings.language.ru">Русский</option>
+                <option value="en" data-i18n="settings.language.en">Английский</option>
+              </select>
+            </div>
+            
+            <div class="setting-item">
+              <label data-i18n="settings.defaultToLang">Язык перевода по умолчанию (для иностранных языков):</label>
+              <select id="default-to-lang">
+                <option value="ru">Русский</option>
+                <option value="en">Английский</option>
+                <option value="de">Немецкий</option>
+                <option value="fr">Французский</option>
+                <option value="es">Испанский</option>
+                <option value="it">Итальянский</option>
+                <option value="zh">Китайский</option>
+                <option value="ja">Японский</option>
+                <option value="ko">Корейский</option>
+              </select>
+            </div>
+
+            <div class="setting-item">
+              <label data-i18n="settings.russianToLang">Язык перевода с русского:</label>
+              <select id="russian-to-lang">
+                <option value="en">Английский</option>
+                <option value="de">Немецкий</option>
+                <option value="fr">Французский</option>
+                <option value="es">Испанский</option>
+                <option value="it">Итальянский</option>
+                <option value="zh">Китайский</option>
+                <option value="ja">Японский</option>
+                <option value="ko">Корейский</option>
+              </select>
+            </div>
+
+            <button class="save-button" id="save-translate" data-i18n="settings.save">Сохранить</button>
+          </div>
+        </div>
+
+        <!-- Вкладка настроек ИИ -->
+        <div class="tab-content" id="ai-tab">
+          <div class="settings-section">
+            <h2 data-i18n="settings.ai">Настройки AI</h2>
+            
+            <div class="setting-item">
+              <label data-i18n="settings.aiModel">Модель по умолчанию:</label>
+              <select id="ai-model">
+                <option value="deepseek">DeepSeek</option>
+                <option value="chatgpt">ChatGPT (OpenAI)</option>
+              </select>
+              <small class="help-text" data-i18n="settings.defaultModelHelp">Выберите модель, которая будет использоваться по умолчанию</small>
+            </div>
+
+            <!-- Настройки DeepSeek -->
+            <div class="model-settings" id="deepseek-settings">
+              <h3 data-i18n="settings.deepseekSettings">Настройки DeepSeek</h3>
+              
+              <div class="setting-item">
+                <label data-i18n="settings.apiKey">API ключ DeepSeek:</label>
+                <input type="password" id="deepseek-api-key" placeholder="Введите API ключ DeepSeek">
+                <small class="help-text">
+                  <a href="https://platform.deepseek.com/api_keys" target="_blank" data-i18n="settings.getKey">получить ключ</a>
+                </small>
+              </div>
+
+              <div class="setting-item">
+                <label data-i18n="settings.temperature">Температура ответа (0.0 - 2.0):</label>
+                <input type="number" id="deepseek-temperature" min="0" max="2" step="0.1" value="0.7">
+                <small class="help-text" data-i18n="settings.temperatureHelp">Чем выше значение, тем более творческие ответы</small>
+              </div>
+            </div>
+
+            <!-- Настройки ChatGPT -->
+            <div class="model-settings" id="chatgpt-settings">
+              <h3 data-i18n="settings.chatgptSettings">Настройки ChatGPT</h3>
+              
+              <div class="setting-item">
+                <label data-i18n="settings.chatgptModel">Модель ChatGPT:</label>
+                <select id="chatgpt-model">
+                  <option value="gpt-4">GPT-4</option>
+                  <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                  <option value="gpt-4o">GPT-4o</option>
+                  <option value="gpt-4o-mini">GPT-4o Mini</option>
+                </select>
+              </div>
+
+              <div class="setting-item">
+                <label data-i18n="settings.apiKey">API ключ ChatGPT:</label>
+                <input type="password" id="chatgpt-api-key" placeholder="Введите API ключ ChatGPT">
+                <small class="help-text">
+                  <a href="https://platform.openai.com/api-keys" target="_blank" data-i18n="settings.getKey">получить ключ</a>
+                </small>
+              </div>
+
+              <div class="setting-item">
+                <label data-i18n="settings.temperature">Температура ответа (0.0 - 2.0):</label>
+                <input type="number" id="chatgpt-temperature" min="0" max="2" step="0.1" value="0.7">
+                <small class="help-text" data-i18n="settings.temperatureHelp">Чем выше значение, тем более творческие ответы</small>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <label data-i18n="settings.systemPrompt">Системный промпт (опционально):</label>
+              <textarea id="system-prompt" rows="4" placeholder="Введите системный промпт для настройки поведения ИИ..."></textarea>
+              <small class="help-text" data-i18n="settings.systemPromptHelp">Этот промпт будет использоваться для настройки поведения модели</small>
+            </div>
+
+            <div class="setting-item">
+              <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="developer-mode" style="width: auto;">
+                <span data-i18n="settings.developerMode">Режим разработчика</span>
+              </label>
+              <small class="help-text" data-i18n="settings.developerModeHelp">Если включен, в чате будет отображаться количество потраченных токенов на каждый запрос и ответ</small>
+            </div>
+
+            <button class="save-button" id="save-ai" data-i18n="settings.save">Сохранить</button>
+          </div>
+        </div>
+
+        <!-- Вкладка шаблонов промптов -->
+        <div class="tab-content" id="templates-tab">
+          <div class="settings-section">
+            <h2 data-i18n="settings.templates">Шаблоны промптов</h2>
+            
+            <div class="templates-list" id="templates-list">
+              <!-- Шаблоны будут загружены динамически -->
+            </div>
+
+            <div class="template-form" id="template-form" style="display: none;">
+              <h3 id="template-form-title" data-i18n="settings.templateNew">Новый шаблон</h3>
+              <div class="setting-item">
+                <label data-i18n="settings.templateName">Название шаблона:</label>
+                <input type="text" id="template-name" placeholder="Например: Объяснить простыми словами">
+              </div>
+              <div class="setting-item">
+                <label data-i18n="settings.templatePrompt">Промпт:</label>
+                <textarea id="template-prompt" rows="3" placeholder="Введите текст промпта. Используйте : в конце, чтобы текст добавлялся после промпта"></textarea>
+              </div>
+              <div class="setting-item">
+                <label data-i18n="settings.templateDescription">Описание (опционально):</label>
+                <input type="text" id="template-description" placeholder="Краткое описание шаблона">
+              </div>
+              <div class="setting-item">
+                <label data-i18n="settings.templateShortName">Краткое название (для быстрого доступа, до 15 символов):</label>
+                <input type="text" id="template-short-name" placeholder="Например: упрости" maxlength="15">
+                <small class="help-text" data-i18n="settings.templateShortNameHelp">Если указано, промпт будет доступен в меню быстрого доступа через кнопку +</small>
+              </div>
+              <div class="template-form-actions">
+                <button class="save-button" id="save-template" data-i18n="settings.save">Сохранить</button>
+                <button class="cancel-button" id="cancel-template" data-i18n="settings.templateCancel">Отмена</button>
+              </div>
+            </div>
+
+            <button class="add-button" id="add-template-btn" data-i18n="settings.templateAdd">+ Добавить шаблон</button>
+          </div>
+        </div>
+
+        <!-- Вкладка "О Расширении" -->
+        <div class="tab-content" id="about-tab">
+          <div class="settings-section">
+            <h2 data-i18n="settings.about">О Расширении</h2>
+            
+            <div class="about-content">
+              <div class="about-item">
+                <label data-i18n="settings.version">Версия:</label>
+                <span id="extension-version">2.0.0</span>
+              </div>
+
+              <div class="about-item">
+                <label data-i18n="settings.description">Описание:</label>
+                <p id="extension-description">Расширение для перевода текста, поиска на странице и объяснения с помощью ИИ</p>
+              </div>
+
+              <div class="about-item">
+                <label data-i18n="settings.github">Репозиторий GitHub:</label>
+                <a href="https://github.com/The-Open-Tech-Company/ask-extension-browser" target="_blank" class="github-link">
+                  https://github.com/The-Open-Tech-Company/ask-extension-browser
+                </a>
+              </div>
+
+              <div class="about-footer">
+                <p data-i18n="settings.footer">Создано TOTC. Основано на политике Open Source. 2025</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="options-footer">
+          <div id="save-status"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="prompt-templates.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
